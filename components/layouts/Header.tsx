@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { signOut, getAuth } from "firebase/auth";
 
 import { useSession } from "@/contexts/session";
 
@@ -6,7 +7,18 @@ import Image from "next/image";
 import Button from "../Button";
 
 export default function Header() {
-  const { user } = useSession();
+  const { user, setUser } = useSession();
+
+  const auth = getAuth();
+
+  const handleLogOut = async () => {
+    try {
+      await signOut(auth);
+      setUser(null);
+    } catch (e) {
+      console.log("error", e);
+    }
+  };
 
   return (
     <div className="w-full h-14 bg-black text-white flex items-center justify-between px-4 fixed top-0 border-b border-gray-800">
@@ -16,7 +28,7 @@ export default function Header() {
       </Link>
       <div>
         {user ? (
-          <Button text="Log out" />
+          <Button text="Log out" onClick={handleLogOut} />
         ) : (
           <Button text="Sign in" href="/login" />
         )}
