@@ -10,15 +10,10 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { useFirebase } from "contexts/firebase";
 
+import { User } from "interfaces";
+
 interface SessionProviderProps {
   children: ReactElement;
-}
-
-interface User {
-  groups: string[];
-  likes: string[];
-  hates: string[];
-  displayName: string;
 }
 
 interface ISessionContext {
