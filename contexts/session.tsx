@@ -53,7 +53,7 @@ export const SessionProvider = ({ children }: SessionProviderProps) => {
         });
       }
     }
-  }, []);
+  }, [db]);
 
   return (
     <SessionContext.Provider value={{ user, setUser }}>
