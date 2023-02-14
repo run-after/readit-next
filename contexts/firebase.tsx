@@ -1,6 +1,24 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { getFirestore } from "firebase/firestore";
-import { initializeApp } from "firebase/app";
+import {
+  createContext,
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
+import { Firestore, getFirestore } from "firebase/firestore";
+import { FirebaseApp, initializeApp } from "firebase/app";
+
+interface FirebaseProviderProps {
+  children: ReactElement;
+}
+
+interface IFirebaseContext {
+  app: FirebaseApp;
+  setApp: Dispatch<SetStateAction<FirebaseApp>>;
+  db: Firestore;
+  setDb: Dispatch<SetStateAction<Firestore>>;
+}
 
 // Only want this to run once
 const initApp = initializeApp({
@@ -18,20 +36,19 @@ console.log("init ran");
 //////////////////////////////////
 
 // Create context
-const FirebaseContext = createContext({
+const FirebaseContext = createContext<IFirebaseContext>({
   app: initApp,
   setApp: () => {},
   db: initDb,
   setDb: () => {},
 });
 
-export const FirebaseProvider = ({ children }) => {
+export const FirebaseProvider = ({ children }: FirebaseProviderProps) => {
   const [app, setApp] = useState(initApp);
   const [db, setDb] = useState(initDb);
-  const value = { app, setApp, db, setDb };
 
   return (
-    <FirebaseContext.Provider value={value}>
+    <FirebaseContext.Provider value={{ app, setApp, db, setDb }}>
       {children}
     </FirebaseContext.Provider>
   );
