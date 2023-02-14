@@ -1,22 +1,41 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactElement,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { doc, getDoc } from "firebase/firestore";
-
 import { useFirebase } from "contexts/firebase";
 
-const SessionContext = createContext({ user: null, setUser: () => {} });
+interface SessionProviderProps {
+  children: ReactElement;
+}
 
-// login
+interface User {
+  groups: string[];
+  likes: string[];
+  hates: string[];
+  displayName: string;
+}
 
-// logout
+interface ISessionContext {
+  user: User | null;
+  setUser: Dispatch<SetStateAction<User | null>>;
+}
 
-// register
+const SessionContext = createContext<ISessionContext>({
+  user: null,
+  setUser: () => {},
+});
 
-export const SessionProvider = ({ children }) => {
-  //const data = useSessionProvider();
+export const SessionProvider = ({ children }: SessionProviderProps) => {
+  // Local state
+  const [user, setUser] = useState<User | null>(null);
 
-  const [user, setUser] = useState(null);
-  const value = { user, setUser };
-
+  // Access db
   const { db } = useFirebase();
 
   // Check if user is logged in
@@ -30,17 +49,23 @@ export const SessionProvider = ({ children }) => {
 
         // Get/set user info from firestore
         getDoc(doc(db, "users", name)).then((info) => {
-          console.log("info", info);
-          console.log("info.data", info.data());
-          setUser(info.data());
+          setUser(info.data() as User);
         });
       }
     }
   }, []);
 
   return (
-    <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+    <SessionContext.Provider value={{ user, setUser }}>
+      {children}
+    </SessionContext.Provider>
   );
 };
 
 export const useSession = () => useContext(SessionContext);
+
+// login
+
+// logout
+
+// register
