@@ -8,19 +8,24 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-
 import { useSession } from "@/contexts/session";
 import { useFirebase } from "@/contexts/firebase";
+
+import { User } from "interfaces";
 
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Main from "@/components/layouts/Main";
 
 export default function Login() {
+  // Access router
   const router = useRouter();
+
+  // Access context
   const { setUser } = useSession();
   const { db } = useFirebase();
 
+  // Local state
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -45,11 +50,12 @@ export default function Login() {
         password.value
       );
 
+      // Get display name
+      const displayName = userCredentials.user.displayName || "";
+
       // Get/set user info from firestore
-      const userInfo = await getDoc(
-        doc(db, "users", userCredentials.user.displayName)
-      );
-      setUser(userInfo.data());
+      const userInfo = await getDoc(doc(db, "users", displayName));
+      setUser(userInfo.data() as User);
 
       // Redirect to home
       router.replace("/");
@@ -94,7 +100,7 @@ export default function Login() {
 
           <div className="">
             <p className="text-sm font-gray-500">
-              Or if you don't have an account, you can
+              Or if you do not have an account, you can
             </p>
             <Link
               href="/register"
