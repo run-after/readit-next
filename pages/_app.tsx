@@ -1,6 +1,6 @@
 import type { AppProps } from "next/app";
-import { SessionProvider } from "contexts/session";
 
+import { SessionProvider } from "contexts/session";
 import { FirebaseProvider } from "@/contexts/firebase";
 
 import "@/styles/globals.css";
