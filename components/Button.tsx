@@ -7,6 +7,7 @@ interface Button {
   onClick?(event: React.MouseEvent<HTMLButtonElement>): void;
   href?: string;
   block?: boolean;
+  rounded?: boolean;
 }
 
 export default function Button({
@@ -16,15 +17,22 @@ export default function Button({
   onClick = () => {},
   href = "",
   block,
+  rounded,
 }: Button) {
   // Default classes
-  let finalClass = `rounded ${block ? "w-full" : ""}`;
+  let finalClass = `${rounded ? "rounded-full px-4" : "rounded"} ${
+    block ? "w-full" : ""
+  }`;
 
   // Determine background color
   switch (color) {
     default:
     case "green":
       finalClass += " bg-green-400 text-black";
+      break;
+    case "gray":
+      finalClass += " bg-gray-400 text-black";
+      break;
   }
 
   // Determine padding
@@ -32,6 +40,10 @@ export default function Button({
     default:
     case "md":
       finalClass += " p-2";
+      break;
+    case "sm":
+      finalClass += " p-0";
+      break;
   }
 
   if (href)
