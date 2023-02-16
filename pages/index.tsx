@@ -5,7 +5,7 @@ import { useFirebase } from "@/contexts/firebase";
 import { IPost } from "@/interfaces";
 
 import Main from "@/components/layouts/Main";
-import Post from "@/components/Post";
+import PostFeed from "@/components/PostFeed";
 
 export default function Home() {
   // Local state
@@ -32,11 +32,7 @@ export default function Home() {
 
   return (
     <Main>
-      <div className="p-4 px-12 space-y-6">
-        {allPosts.map((post: IPost) => (
-          <Post key={post.timestamp} post={post} />
-        ))}
-      </div>
+      <PostFeed posts={allPosts} />
     </Main>
   );
 }
@@ -44,3 +40,4 @@ export default function Home() {
 // TODO:
 // Add loader
 // Make a link component with hover effects
+// Add personalized feed

@@ -16,7 +16,7 @@ import { IPost } from "@/interfaces";
 
 import Main from "@/components/layouts/Main";
 import Button from "@/components/Button";
-import Post from "@/components/Post";
+import PostFeed from "@/components/PostFeed";
 
 export interface IGroup {
   description: string;
@@ -146,11 +146,7 @@ export default function Group() {
       {/* Main section */}
       <div className="flex gap-4">
         {/* Feed */}
-        <div className="p-4 px-12 space-y-6 flex-1">
-          {posts.map((post: IPost) => (
-            <Post key={post.timestamp} post={post} showGroupButton={false} />
-          ))}
-        </div>
+        <PostFeed posts={posts} showGroupButtons={false} />
         {/* Community card */}
         <div className="w-1/4 border border-gray-800 m-4 p-4 rounded space-y-4">
           <h6 className="text-gray-500 text-bold">About Community</h6>
