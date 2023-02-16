@@ -11,9 +11,10 @@ import Modal from "./Modal";
 
 type PostProp = {
   post: IPost;
+  showGroupButton: boolean;
 };
 
-export default function Post({ post }: PostProp) {
+export default function Post({ post, showGroupButton = true }: PostProp) {
   // Access contexts
   const { user, setUser } = useSession();
   const { db } = useFirebase();
@@ -81,6 +82,7 @@ export default function Post({ post }: PostProp) {
       {/* Heading */}
       <div className="flex justify-between gap-2 items-center">
         <div className="flex gap-2 items-center">
+          {/* TODO: Add image to group */}
           <div className="rounded-full h-6 w-6 bg-red-400" />
           <Link
             href={`/groups/${post.group}`}
@@ -102,17 +104,19 @@ export default function Post({ post }: PostProp) {
           </p>
         </div>
         {/* Join/leave button */}
-        <Button
-          text={user?.groups.includes(post.group) ? "Leave" : "Join"}
-          color="gray"
-          size="sm"
-          rounded
-          onClick={
-            user?.groups.includes(post.group)
-              ? (e) => handleLeaveGroup(post.group, e)
-              : (e) => handleJoinGroup(post.group, e)
-          }
-        />
+        {showGroupButton && (
+          <Button
+            text={user?.groups.includes(post.group) ? "Leave" : "Join"}
+            color="gray"
+            size="sm"
+            rounded
+            onClick={
+              user?.groups.includes(post.group)
+                ? (e) => handleLeaveGroup(post.group, e)
+                : (e) => handleJoinGroup(post.group, e)
+            }
+          />
+        )}
       </div>
       {/* Title */}
       <h6 className="font-bold text-lg">{post.title}</h6>
