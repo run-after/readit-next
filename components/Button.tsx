@@ -22,7 +22,7 @@ export default function Button({
   // Default classes
   let finalClass = `${rounded ? "rounded-full px-4" : "rounded"} ${
     block ? "w-full" : ""
-  }`;
+  } hover:opacity-70`;
 
   // Determine background color
   switch (color) {
