@@ -11,7 +11,7 @@ import Modal from "./Modal";
 
 type PostProp = {
   post: IPost;
-  showGroupButton: boolean;
+  showGroupButton?: boolean;
 };
 
 export default function Post({ post, showGroupButton = true }: PostProp) {
