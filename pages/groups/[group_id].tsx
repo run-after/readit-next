@@ -144,7 +144,7 @@ export default function Group() {
         </div>
       </div>
       {/* Main section */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-start">
         {/* Feed */}
         <PostFeed posts={posts} showGroupButtons={false} />
         {/* Community card */}
