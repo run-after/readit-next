@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { MouseEvent } from "react";
 
 interface Button {
   text: string;
   color?: string;
   size?: string;
-  onClick?(event: React.MouseEvent<HTMLButtonElement>): void;
+  onClick?(event: MouseEvent<HTMLButtonElement>): void;
   href?: string;
   block?: boolean;
   rounded?: boolean;
