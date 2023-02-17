@@ -18,7 +18,10 @@ export default function Home() {
     try {
       let arr: IPost[] = [];
       const querySnapshot = await getDocs(collection(db, "posts"));
-      querySnapshot.forEach((doc) => arr.push(doc.data() as IPost));
+      querySnapshot.forEach((doc) => {
+        const post = { ...doc.data(), id: doc.id };
+        arr.push(post as IPost);
+      });
 
       setAllPosts(arr);
     } catch (e) {
