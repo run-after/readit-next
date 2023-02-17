@@ -43,7 +43,10 @@ export default function Group() {
       const querySnapshot = await getDocs(
         query(collection(db, "posts"), where("group", "==", group_id))
       );
-      querySnapshot.forEach((doc) => arr.push(doc.data() as IPost));
+      querySnapshot.forEach((doc) => {
+        const post = { ...doc.data(), id: doc.id };
+        arr.push(post as IPost);
+      });
 
       setPosts(arr);
     } catch (e) {
