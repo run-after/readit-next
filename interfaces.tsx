@@ -12,4 +12,13 @@ export interface IPost {
   timestamp: number;
   title: string;
   user: string;
+  id: string;
+}
+export interface IComment {
+  user: string;
+  timestamp: number;
+  content: string;
+  likes: number;
+  post: string;
+  id: string;
 }
