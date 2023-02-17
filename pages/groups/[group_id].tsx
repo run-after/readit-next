@@ -35,6 +35,55 @@ export default function Group() {
   const [posts, setPosts] = useState<IPost[]>([]);
   const [groupDescription, setGroupDescription] = useState<IGroup>();
 
+  // TODO: Move into helper
+  const handleJoinGroup = async (
+    group: string,
+    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+  ) => {
+    // Stop parent element onClick
+    e.stopPropagation();
+
+    if (!user) return; // Prompt to login
+
+    // Copy user groups
+    const tempGroups = [...user.groups];
+
+    // Push new group
+    tempGroups.push(group);
+
+    // Update user
+    await setDoc(doc(db, "users", user.displayName), {
+      ...user,
+      groups: tempGroups,
+    });
+
+    // Update user context
+    setUser({ ...user, groups: tempGroups });
+  };
+
+  // TODO: Move into helper
+  const handleLeaveGroup = async (
+    group: string,
+    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
+  ) => {
+    // Stop parent element onClick
+    e.stopPropagation();
+
+    if (!user) return; // Prompt to login
+
+    // Copy user groups
+    const tempGroups = [...user.groups].filter((x) => x !== group);
+
+    // Update user
+    await setDoc(doc(db, "users", user.displayName), {
+      ...user,
+      groups: tempGroups,
+    });
+
+    // Update user context
+    setUser({ ...user, groups: tempGroups });
+  };
+
   const getPosts = async () => {
     try {
       let arr: IPost[] = [];
@@ -64,53 +113,7 @@ export default function Group() {
     }
   };
 
-  const handleJoinGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) return; // Prompt to login
-
-    // Copy user groups
-    const tempGroups = [...user.groups];
-
-    // Push new group
-    tempGroups.push(group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
-  };
-
-  const handleLeaveGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) return; // Prompt to login
-
-    // Copy user groups
-    const tempGroups = [...user.groups].filter((x) => x !== group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
-  };
-
+  // Maybe SSR
   useEffect(() => {
     if (group_id) {
       getPosts();
