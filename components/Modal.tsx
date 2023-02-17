@@ -10,7 +10,9 @@ export default function Modal({ onClose, children }: IModal) {
   // Prevent scroll when open
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    return () => (document.body.style.overflow = "unset");
+    return function () {
+      document.body.style.overflow = "unset";
+    };
   }, []);
 
   return (
