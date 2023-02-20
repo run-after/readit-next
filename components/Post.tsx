@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useState, MouseEvent } from "react";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -8,6 +7,8 @@ import { useFirebase } from "@/contexts/firebase";
 
 import Button from "./Button";
 import Modal from "./Modal";
+import FullPost from "./FullPost";
+import LocalLink from "./LocalLink";
 
 type PostProp = {
   post: IPost;
@@ -34,7 +35,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
     // Stop parent element onClick
     e.stopPropagation();
 
-    if (!user) return; // Prompt to login
+    if (!user) return; // TODO: Prompt to login
 
     // Copy user groups
     const tempGroups = [...user.groups];
@@ -59,7 +60,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
     // Stop parent element onClick
     e.stopPropagation();
 
-    if (!user) return; // Prompt to login
+    if (!user) return; // TODO: Prompt to login
 
     // Copy user groups
     const tempGroups = [...user.groups].filter((x) => x !== group);
@@ -84,22 +85,19 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
         <div className="flex gap-2 items-center">
           {/* TODO: Add image to group */}
           <div className="rounded-full h-6 w-6 bg-red-400" />
-          <Link
+          <LocalLink
+            text={post.group}
             href={`/groups/${post.group}`}
-            className="text-sm font-semibold hover:underline hover:opacity-80"
             onClick={(e) => e.stopPropagation()}
-          >
-            {post.group}
-          </Link>
+          />
+
           <p className="text-sm opacity-70">
             Posted by:{" "}
-            <Link
-              className="hover:underline hover:opacity-80"
+            <LocalLink
+              text={post.user}
               href={`/users/${post.user}`}
               onClick={(e) => e.stopPropagation()}
-            >
-              {post.user}
-            </Link>{" "}
+            />{" "}
             on {new Date(post.timestamp).toLocaleDateString()}
           </p>
         </div>
@@ -132,9 +130,12 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
           onClose={() => {
             setShowFullPost(false);
           }}
-          info={post}
-        />
+        >
+          <FullPost post={post} />
+        </Modal>
       )}
     </div>
   );
 }
+
+// TODO: Redirect to login if no user for join/leave group
