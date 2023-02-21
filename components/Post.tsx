@@ -180,7 +180,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   };
 
   return (
-    <div className="flex gap-4 p-4 border border-gray-800 hover:border-white">
+    <div className="flex gap-6 p-4 border border-gray-800 hover:border-white">
       <div className="flex flex-col gap-1 items-center">
         <button onClick={handleUpVote}>
           <ArrowUpCircleIcon
@@ -199,7 +199,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
         </button>
       </div>
       <div
-        className=" flex flex-col gap-2 rounded  hover:cursor-pointer"
+        className="flex flex-col flex-1 gap-2 rounded  hover:cursor-pointer"
         onClick={!showFullPost ? handlePostSelect : undefined}
       >
         {/* Heading */}
