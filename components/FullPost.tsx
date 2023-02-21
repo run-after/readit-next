@@ -1,4 +1,4 @@
-import { MouseEvent, FormEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState, ChangeEvent } from "react";
 import {
   setDoc,
   doc,
@@ -79,7 +79,7 @@ export default function FullPost({ post }: PostProps) {
     setUser({ ...user, groups: tempGroups });
   };
 
-  const handleSubmitComment = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmitComment = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { comment } = e.currentTarget;
 
@@ -98,6 +98,9 @@ export default function FullPost({ post }: PostProps) {
 
       // Refresh comments
       if (docRef) getComments();
+
+      // Clear form
+      e.target.reset();
     } catch (e) {
       console.log(e);
     }
@@ -163,7 +166,7 @@ export default function FullPost({ post }: PostProps) {
         />
       </div>
       {post.image ? (
-        <div className="self-center relative">
+        <div className="self-center p-4">
           <img src={post.image} alt="" />
         </div>
       ) : (
