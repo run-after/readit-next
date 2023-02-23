@@ -1,4 +1,5 @@
 import { MouseEvent, useEffect, useState, ChangeEvent } from "react";
+import { useRouter } from "next/router";
 import {
   setDoc,
   doc,
@@ -23,6 +24,8 @@ interface PostProps {
 }
 
 export default function FullPost({ post }: PostProps) {
+  const router = useRouter();
+
   // Access contexts
   const { user, setUser } = useSession();
   const { db } = useFirebase();
@@ -38,7 +41,10 @@ export default function FullPost({ post }: PostProps) {
     // Stop parent element onClick
     e.stopPropagation();
 
-    if (!user) return; // TODO: Prompt to login
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Copy user groups
     const tempGroups = [...user.groups];
@@ -64,7 +70,10 @@ export default function FullPost({ post }: PostProps) {
     // Stop parent element onClick
     e.stopPropagation();
 
-    if (!user) return; // TODO: Prompt to login
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Copy user groups
     const tempGroups = [...user.groups].filter((x) => x !== group);
@@ -83,7 +92,10 @@ export default function FullPost({ post }: PostProps) {
     e.preventDefault();
     const { comment } = e.currentTarget;
 
-    if (!user) return; // TODO: redirect to login
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     try {
       const newComment = {
