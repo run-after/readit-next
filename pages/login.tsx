@@ -66,6 +66,7 @@ export default function Login() {
       switch (e.code) {
         default:
           setError("Please try again");
+          break;
         case "auth/user-not-found":
           setError("User not found");
           break;
