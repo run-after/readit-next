@@ -17,13 +17,16 @@ export default function Home() {
   const getPosts = async () => {
     try {
       let arr: IPost[] = [];
+
+      // Get posts
       const querySnapshot = await getDocs(collection(db, "posts"));
+      // Add id to each post
       querySnapshot.forEach((doc) => {
         const post = { ...doc.data(), id: doc.id };
         arr.push(post as IPost);
       });
 
-      setAllPosts(arr);
+      setAllPosts(arr.sort((x, y) => x.timestamp - y.timestamp));
     } catch (e) {
       console.log("err", e);
     }
@@ -42,5 +45,4 @@ export default function Home() {
 
 // TODO:
 // Add loader
-// Make a link component with hover effects
 // Add personalized feed
