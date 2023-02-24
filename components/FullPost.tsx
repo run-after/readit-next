@@ -131,7 +131,7 @@ export default function FullPost({ post }: PostProps) {
         arr.push(temp as IComment);
       });
 
-      setComments(arr);
+      setComments(arr.sort((x, y) => x.timestamp - y.timestamp));
     } catch (e) {
       console.log("err", e);
     }
