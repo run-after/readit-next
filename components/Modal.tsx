@@ -30,7 +30,7 @@ export default function Modal({ onClose, children, heading }: IModal) {
           </p>
         </div>
         {/* Main section */}
-        <div className="overflow-y-auto">{children}</div>
+        <div className="overflow-y-auto h-full">{children}</div>
       </div>
     </div>
   );
