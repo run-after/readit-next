@@ -26,7 +26,7 @@ export default function Home() {
         arr.push(post as IPost);
       });
 
-      setAllPosts(arr.sort((x, y) => x.timestamp - y.timestamp));
+      setAllPosts(arr.sort((x, y) => y.timestamp - x.timestamp));
     } catch (e) {
       console.log("err", e);
     }
