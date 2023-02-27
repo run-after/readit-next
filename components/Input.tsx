@@ -3,6 +3,7 @@ interface Input {
   name: string;
   type?: string;
   placeholder?: string;
+  error?: boolean;
 }
 
 export default function Input({
@@ -10,13 +11,16 @@ export default function Input({
   name,
   type = "text",
   placeholder,
+  error,
 }: Input) {
   if (type === "textarea")
     return (
       <div className="space-y-1">
         <p className="text-gray-500 text-sm">{label}</p>
         <textarea
-          className="border rounded w-full p-2 bg-black"
+          className={`${
+            error ? "border-red-500" : ""
+          } border rounded w-full p-2 bg-black`}
           name={name}
           placeholder={placeholder}
         />
@@ -27,7 +31,9 @@ export default function Input({
     <div className="space-y-1">
       <p className="text-gray-500 text-sm">{label}</p>
       <input
-        className="border rounded w-full p-2 bg-black"
+        className={`${
+          error ? "border-red-500" : ""
+        } border rounded w-full p-2 bg-black`}
         name={name}
         type={type}
         placeholder={placeholder}
