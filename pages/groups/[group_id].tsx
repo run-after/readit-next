@@ -17,6 +17,8 @@ import { IPost } from "@/interfaces";
 import Main from "@/components/layouts/Main";
 import Button from "@/components/Button";
 import PostFeed from "@/components/PostFeed";
+import Modal from "@/components/Modal";
+import CreatePost from "@/components/CreatePost";
 
 export interface IGroup {
   description: string;
@@ -34,6 +36,7 @@ export default function Group() {
   // Local state
   const [posts, setPosts] = useState<IPost[]>([]);
   const [groupDescription, setGroupDescription] = useState<IGroup>();
+  const [showCreatePostModal, setShowCreatePostModal] = useState(false);
 
   // TODO: Move into helper
   const handleJoinGroup = async (
@@ -43,7 +46,10 @@ export default function Group() {
     // Stop parent element onClick
     e.stopPropagation();
 
-    if (!user) return; // Prompt to login
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Copy user groups
     const tempGroups = [...user.groups];
@@ -69,7 +75,10 @@ export default function Group() {
     // Stop parent element onClick
     e.stopPropagation();
 
-    if (!user) return; // Prompt to login
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Copy user groups
     const tempGroups = [...user.groups].filter((x) => x !== group);
@@ -82,6 +91,11 @@ export default function Group() {
 
     // Update user context
     setUser({ ...user, groups: tempGroups });
+  };
+
+  const handleCloseModal = () => {
+    getPosts();
+    setShowCreatePostModal(false);
   };
 
   const getPosts = async () => {
@@ -97,7 +111,7 @@ export default function Group() {
         arr.push(post as IPost);
       });
 
-      setPosts(arr);
+      setPosts(arr.sort((x, y) => y.timestamp - x.timestamp));
     } catch (e) {
       console.log("err", e);
     }
@@ -159,9 +173,20 @@ export default function Group() {
           <p className="text-gray-300 text-sm">
             {groupDescription?.description}
           </p>
-          <Button text="Create post" color="gray" block rounded />
+          <Button
+            onClick={() => setShowCreatePostModal(true)}
+            text="Create post"
+            color="gray"
+            block
+            rounded
+          />
         </div>
       </div>
+      {showCreatePostModal && (
+        <Modal onClose={() => setShowCreatePostModal(false)}>
+          <CreatePost group={group_id} closeModal={handleCloseModal} />
+        </Modal>
+      )}
     </Main>
   );
 }
