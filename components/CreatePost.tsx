@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState, MouseEvent } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import { useFirebase } from "@/contexts/firebase";
