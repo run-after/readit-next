@@ -1,12 +1,14 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { collection, getDocs, addDoc } from "firebase/firestore";
-import { useFirebase } from "@/contexts/firebase";
+import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 
+import { useFirebase } from "@/contexts/firebase";
 import { useSession } from "@/contexts/session";
 
 import Input from "./Input";
 import Button from "./Button";
+import ImageUploader from "./ImageUploader";
 
 interface ICreatePost {
   group?: string | string[] | undefined;
@@ -25,6 +27,7 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
   const [postType, setPostType] = useState("text");
   const [groups, setGroups] = useState<String[]>([]);
   const [errorArr, setErrorArr] = useState<String[]>([]);
+  const [image, setImage] = useState<File | null>(null);
 
   const handleCreatePost = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,12 +35,18 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
     let errors = [];
 
     // Destructure form
-    const { title, content, group, image } = e.currentTarget;
+    const { title, content, group } = e.currentTarget;
+
+    // Default image url
+    let imageURL = null;
 
     // Check for errors
     if (!title.value) errors.push("titleError");
-    if (!content.value && !image) errors.push("contentError");
+    if (!content?.value && postType === "text") errors.push("contentError");
     if (!group.value) errors.push("groupError");
+    if (postType === "image") {
+      if (!image || image.size > 2000000) errors.push("imageError");
+    }
 
     // Do not submit if errors
     if (errors.length > 0) {
@@ -50,16 +59,24 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
       router.replace("/login");
       return;
     }
+
     try {
+      // Check for image
+      if (image) {
+        const imageRef = ref(getStorage(), image.name);
+        const snapshot = await uploadBytes(imageRef, image);
+        if (snapshot) imageURL = await getDownloadURL(imageRef);
+      }
+
       // Create new post
       const newPost = {
-        content: content.value,
+        content: content?.value ?? null,
         likes: 0,
         timestamp: new Date().getTime(),
         user: user.displayName,
         group: group.value,
         title: title.value,
-        image: image?.value || null,
+        image: imageURL,
       };
 
       const docRef = await addDoc(collection(db, "posts"), newPost);
@@ -97,7 +114,7 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
   return (
     <div className="flex flex-col justify-center h-full p-4">
       {/* Buttons */}
-      <div className="flex gap-8 p-1">
+      <div className="flex gap-8 py-2">
         <button
           className={`${
             postType === "text" ? "bg-gray-800" : ""
@@ -121,21 +138,32 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
           name="title"
           placeholder="Title"
           error={errorArr.includes("titleError")}
+          onChange={() =>
+            setErrorArr(errorArr.filter((err) => err !== "titleError"))
+          }
         />
-        {/* TODO: IMAGE FORM */}
+
         {postType === "text" ? (
           <Input
             type="textarea"
             name="content"
             placeholder="Content"
             error={errorArr.includes("contentError")}
+            onChange={() =>
+              setErrorArr(errorArr.filter((err) => err !== "contentError"))
+            }
           />
         ) : (
-          // Need to select an image picker (2MB max) https://www.npmjs.com/package/react-images-uploading
-          <input type="file" accept=".png .jpeg .jpg .gif" />
+          <ImageUploader
+            image={image}
+            onChange={setImage}
+            errorArr={errorArr}
+            setErrorArr={setErrorArr}
+          />
         )}
 
         <div className="flex gap-2 justify-end">
+          {/* TODO: warning about the selected prop on option */}
           <select name="group" className="bg-black border px-2 py-1 flex-1">
             {groups?.map((theGroup) => (
               <option
@@ -156,7 +184,12 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
               closeModal();
             }}
           />
-          <Button rounded size="sm" text="Post" />
+          <Button
+            rounded
+            size="sm"
+            text="Post"
+            disabled={errorArr.length > 0}
+          />
         </div>
       </form>
     </div>
