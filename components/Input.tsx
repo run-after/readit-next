@@ -4,6 +4,7 @@ interface Input {
   type?: string;
   placeholder?: string;
   error?: boolean;
+  onChange?: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
 }
 
 export default function Input({
@@ -12,6 +13,7 @@ export default function Input({
   type = "text",
   placeholder,
   error,
+  onChange,
 }: Input) {
   if (type === "textarea")
     return (
@@ -23,6 +25,7 @@ export default function Input({
           } border rounded w-full p-2 bg-black`}
           name={name}
           placeholder={placeholder}
+          onChange={onChange}
         />
       </div>
     );
@@ -37,6 +40,7 @@ export default function Input({
         name={name}
         type={type}
         placeholder={placeholder}
+        onChange={onChange}
       />
     </div>
   );
