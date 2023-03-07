@@ -9,6 +9,7 @@ interface Button {
   href?: string;
   block?: boolean;
   rounded?: boolean;
+  disabled?: boolean;
 }
 
 export default function Button({
@@ -19,11 +20,12 @@ export default function Button({
   href = "",
   block,
   rounded,
+  disabled = false,
 }: Button) {
   // Default classes
   let finalClass = `${rounded ? "rounded-full px-4" : "rounded"} ${
     block ? "w-full" : ""
-  } hover:opacity-70`;
+  } ${disabled ? "opacity-80 cursor-not-allowed" : ""} hover:opacity-70`;
 
   // Determine background color
   switch (color) {
@@ -34,6 +36,8 @@ export default function Button({
     case "gray":
       finalClass += " bg-gray-400 text-black";
       break;
+    case "red":
+      finalClass += " bg-red-600 text-white";
   }
 
   // Determine padding
@@ -55,7 +59,7 @@ export default function Button({
     );
 
   return (
-    <button className={finalClass} onClick={onClick}>
+    <button className={finalClass} onClick={disabled ? undefined : onClick}>
       {text}
     </button>
   );
