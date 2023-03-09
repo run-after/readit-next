@@ -25,7 +25,7 @@ export default function Button({
   // Default classes
   let finalClass = `${rounded ? "rounded-full px-4" : "rounded"} ${
     block ? "w-full" : ""
-  } ${disabled ? "opacity-80 cursor-not-allowed" : ""} hover:opacity-70`;
+  } hover:opacity-70`;
 
   // Determine background color
   switch (color) {
@@ -39,6 +39,9 @@ export default function Button({
     case "red":
       finalClass += " bg-red-600 text-white";
   }
+
+  // Check if button is disabled
+  if (disabled) finalClass += " opacity-70 cursor-not-allowed";
 
   // Determine padding
   switch (size) {
