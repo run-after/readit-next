@@ -4,6 +4,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 import { IComment } from "@/interfaces";
 import { useSession } from "@/contexts/session";
@@ -20,11 +21,18 @@ export default function Comment({ comment }: CommentProp) {
   const { user, setUser } = useSession();
   const { db } = useFirebase();
 
+  // Access router
+  const router = useRouter();
+
   // Local state
   const [likeCount, setLikeCount] = useState(comment.likes);
 
   const handleUpVote = async () => {
-    if (!user) return; // TODO: redirect to login
+    // Redirect to login if no user
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Don't allow more than 1 upvote
     if (user.likes.includes(comment.id)) return;
@@ -54,7 +62,11 @@ export default function Comment({ comment }: CommentProp) {
   };
 
   const handleDownVote = async () => {
-    if (!user) return; // TODO: redirect to login
+    // Redirect to login if no user
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Don't allow more than 1 downvote
     if (user.hates.includes(comment.id)) return;
@@ -114,5 +126,3 @@ export default function Comment({ comment }: CommentProp) {
     </div>
   );
 }
-
-// TODO: Handle unauthed user
