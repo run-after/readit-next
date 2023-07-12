@@ -36,15 +36,16 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
     let errors = [];
 
     // Destructure form
-    const { title, content, group } = e.currentTarget;
+    const { titleInput, contentInput, groupInput } = e.currentTarget;
 
     // Default image url
     let imageURL = null;
 
     // Check for errors
-    if (!title.value) errors.push("titleError");
-    if (!content?.value && postType === "text") errors.push("contentError");
-    if (!group.value) errors.push("groupError");
+    if (!titleInput.value) errors.push("titleError");
+    if (!contentInput?.value && postType === "text")
+      errors.push("contentError");
+    if (!groupInput.value) errors.push("groupError");
     if (postType === "image") {
       if (!image || image.size > 2000000) errors.push("imageError");
     }
@@ -71,12 +72,12 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
 
       // Create new post
       const newPost = {
-        content: content?.value ?? null,
+        content: contentInput?.value ?? null,
         likes: 0,
         timestamp: new Date().getTime(),
         user: user.displayName,
-        group: group.value,
-        title: title.value,
+        group: groupInput.value,
+        title: titleInput.value,
         image: imageURL,
       };
 
@@ -110,7 +111,7 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
 
   useEffect(() => {
     getAllGroups();
-    setSelectedGroup(group);
+    setSelectedGroup(`${group}`);
   }, []);
 
   return (
