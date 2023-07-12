@@ -174,6 +174,7 @@ export default function Group() {
             {groupDescription?.description}
           </p>
           <Button
+            disabled={!user}
             onClick={() => setShowCreatePostModal(true)}
             text="Create post"
             color="gray"
