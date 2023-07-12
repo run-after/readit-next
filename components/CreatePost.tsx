@@ -26,6 +26,7 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
   // Local state
   const [postType, setPostType] = useState("text");
   const [groups, setGroups] = useState<String[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<String>("");
   const [errorArr, setErrorArr] = useState<String[]>([]);
   const [image, setImage] = useState<File | null>(null);
 
@@ -109,6 +110,7 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
 
   useEffect(() => {
     getAllGroups();
+    setSelectedGroup(group);
   }, []);
 
   return (
@@ -163,14 +165,14 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
         )}
 
         <div className="flex gap-2 justify-end">
-          {/* TODO: warning about the selected prop on option */}
-          <select name="group" className="bg-black border px-2 py-1 flex-1">
+          <select
+            name="group"
+            className="bg-black border px-2 py-1 flex-1"
+            value={`${selectedGroup}`}
+            onChange={(e) => setSelectedGroup(e.target.value)}
+          >
             {groups?.map((theGroup) => (
-              <option
-                key={`${theGroup}`}
-                value={`${theGroup}`}
-                selected={theGroup === group}
-              >
+              <option key={`${theGroup}`} value={`${theGroup}`}>
                 {theGroup}
               </option>
             ))}
