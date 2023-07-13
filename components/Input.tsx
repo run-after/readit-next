@@ -5,6 +5,7 @@ interface Input {
   placeholder?: string;
   error?: boolean;
   onChange?: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
+  disabled?: boolean;
 }
 
 export default function Input({
@@ -14,6 +15,7 @@ export default function Input({
   placeholder,
   error,
   onChange,
+  disabled,
 }: Input) {
   if (type === "textarea")
     return (
@@ -26,6 +28,7 @@ export default function Input({
           name={name}
           placeholder={placeholder}
           onChange={onChange}
+          disabled={disabled}
         />
       </div>
     );
@@ -41,6 +44,7 @@ export default function Input({
         type={type}
         placeholder={placeholder}
         onChange={onChange}
+        disabled={disabled}
       />
     </div>
   );
