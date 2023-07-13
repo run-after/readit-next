@@ -1,14 +1,6 @@
-import { MouseEvent, useEffect, useState, ChangeEvent } from "react";
+import { MouseEvent, ChangeEvent } from "react";
 import { useRouter } from "next/router";
-import {
-  setDoc,
-  doc,
-  query,
-  collection,
-  getDocs,
-  where,
-  addDoc,
-} from "firebase/firestore";
+import { setDoc, doc, collection, addDoc } from "firebase/firestore";
 
 import { useSession } from "@/contexts/session";
 import { useFirebase } from "@/contexts/firebase";
@@ -21,17 +13,16 @@ import LocalLink from "./LocalLink";
 
 interface PostProps {
   post: IPost;
+  comments: IComment[];
+  getComments: Function;
 }
 
-export default function FullPost({ post }: PostProps) {
+export default function FullPost({ post, comments, getComments }: PostProps) {
   const router = useRouter();
 
   // Access contexts
   const { user, setUser } = useSession();
   const { db } = useFirebase();
-
-  // Local state
-  const [comments, setComments] = useState<IComment[]>([]);
 
   // TODO: Move into helper
   const handleJoinGroup = async (
@@ -118,29 +109,6 @@ export default function FullPost({ post }: PostProps) {
     }
   };
 
-  // Maybe SSR
-  const getComments = async () => {
-    try {
-      let arr: IComment[] = [];
-      // Get all post comments
-      const querySnapshot = await getDocs(
-        query(collection(db, "comments"), where("post", "==", post.id))
-      );
-      querySnapshot.forEach((doc) => {
-        const temp = { ...doc.data(), id: doc.id };
-        arr.push(temp as IComment);
-      });
-
-      setComments(arr.sort((x, y) => y.timestamp - x.timestamp));
-    } catch (e) {
-      console.log("err", e);
-    }
-  };
-
-  useEffect(() => {
-    getComments();
-  }, []);
-
   return (
     <div className="space-y-8">
       {/* Heading */}
@@ -164,7 +132,6 @@ export default function FullPost({ post }: PostProps) {
           </p>
         </div>
         {/* Join/leave button */}
-
         <Button
           text={user?.groups.includes(post.group) ? "Leave" : "Join"}
           color="gray"
