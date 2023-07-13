@@ -131,7 +131,11 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   };
 
   const handleUpVote = async () => {
-    if (!user) return; // TODO: redirect to login
+    // Redirect to login if no user
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Don't allow more than 1 upvote
     if (user.likes.includes(post.id)) return;
@@ -160,7 +164,11 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   };
 
   const handleDownVote = async () => {
-    if (!user) return; // TODO: redirect to login
+    // Redirect to login if no user
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Don't allow more than 1 downvote
     if (user.hates.includes(post.id)) return;
