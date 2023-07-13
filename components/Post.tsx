@@ -4,6 +4,7 @@ import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/solid";
+import { useRouter } from "next/router";
 
 import { IPost } from "@/interfaces";
 import { useSession } from "@/contexts/session";
@@ -60,6 +61,9 @@ const Heading = ({
 };
 
 export default function Post({ post, showGroupButton = true }: PostProp) {
+  // Access router
+  const router = useRouter();
+
   // Access contexts
   const { user, setUser } = useSession();
   const { db } = useFirebase();
@@ -80,7 +84,10 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
     // Stop parent element onClick
     e.stopPropagation();
 
-    if (!user) return; // TODO: Prompt to login
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Copy user groups
     const tempGroups = [...user.groups];
@@ -105,7 +112,10 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
     // Stop parent element onClick
     e.stopPropagation();
 
-    if (!user) return; // TODO: Prompt to login
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
 
     // Copy user groups
     const tempGroups = [...user.groups].filter((x) => x !== group);
@@ -268,5 +278,3 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
     </div>
   );
 }
-
-// TODO: Redirect to login if no user for join/leave group
