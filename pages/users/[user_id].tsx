@@ -28,6 +28,7 @@ export default function User() {
 
   // Local state
   const [userPosts, setUserPosts] = useState<IPost[]>([]);
+  const [postComments, setPostComments] = useState<IComment[]>([]);
   const [userComments, setUserComments] = useState<IComment[]>([]);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
 
@@ -48,6 +49,29 @@ export default function User() {
       console.log("err", e);
     }
   };
+
+  // TODO: Move to helper
+  const getComments = async () => {
+    try {
+      let arr: IComment[] = [];
+      // Get all post comments
+      const querySnapshot = await getDocs(
+        query(collection(db, "comments"), where("post", "==", selectedPost?.id))
+      );
+      querySnapshot.forEach((doc) => {
+        const temp = { ...doc.data(), id: doc.id };
+        arr.push(temp as IComment);
+      });
+
+      setPostComments(arr.sort((x, y) => y.timestamp - x.timestamp));
+    } catch (e) {
+      console.log("err", e);
+    }
+  };
+
+  useEffect(() => {
+    getComments();
+  }, []);
 
   const getUserComments = async () => {
     let commentArr: IComment[] = [];
@@ -123,7 +147,11 @@ export default function User() {
             setSelectedPost(null);
           }}
         >
-          <FullPost post={selectedPost} />
+          <FullPost
+            post={selectedPost}
+            comments={postComments}
+            getComments={getComments}
+          />
         </Modal>
       )}
     </Main>
