@@ -1,12 +1,20 @@
-import { useState, MouseEvent, MouseEventHandler } from "react";
-import { doc, setDoc } from "firebase/firestore";
+import { useState, MouseEvent, MouseEventHandler, useEffect } from "react";
+import {
+  doc,
+  setDoc,
+  query,
+  collection,
+  getDocs,
+  where,
+} from "firebase/firestore";
 import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/solid";
+import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
 
-import { IPost } from "@/interfaces";
+import { IComment, IPost } from "@/interfaces";
 import { useSession } from "@/contexts/session";
 import { useFirebase } from "@/contexts/firebase";
 
@@ -71,6 +79,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   // Local state
   const [showFullPost, setShowFullPost] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
+  const [comments, setComments] = useState<IComment[]>([]);
 
   const handlePostSelect = () => {
     // Open modal with post info inside
@@ -197,6 +206,29 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
     }
   };
 
+  // TODO: Move to helper
+  const getComments = async () => {
+    try {
+      let arr: IComment[] = [];
+      // Get all post comments
+      const querySnapshot = await getDocs(
+        query(collection(db, "comments"), where("post", "==", post.id))
+      );
+      querySnapshot.forEach((doc) => {
+        const temp = { ...doc.data(), id: doc.id };
+        arr.push(temp as IComment);
+      });
+
+      setComments(arr.sort((x, y) => y.timestamp - x.timestamp));
+    } catch (e) {
+      console.log("err", e);
+    }
+  };
+
+  useEffect(() => {
+    getComments();
+  }, []);
+
   return (
     <div className="flex gap-6 p-4 border border-gray-800 hover:border-white">
       <div className="flex flex-col gap-1 items-center">
@@ -264,6 +296,14 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
             <img src={post.image} alt="" />
           </div>
         )}
+        {/* Comments */}
+        <div className="pt-2 flex gap-2 items-center">
+          <ChatBubbleLeftIcon className="h-4 w-4" />
+          <p className="text-sm">
+            {comments.length} Comment{comments.length !== 1 && "s"}
+          </p>
+        </div>
+
         {/* Modal */}
         {showFullPost && (
           <Modal
@@ -279,7 +319,11 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
               setShowFullPost(false);
             }}
           >
-            <FullPost post={post} />
+            <FullPost
+              post={post}
+              comments={comments}
+              getComments={getComments}
+            />
           </Modal>
         )}
       </div>
