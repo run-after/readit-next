@@ -190,8 +190,9 @@ export default function FullPost({ post }: PostProps) {
           <Input
             name="comment"
             placeholder="What are your thoughts?"
-            label={`Comment as ${user?.displayName}`}
+            label={user ? `Comment as ${user.displayName}` : "Leave a comment"}
             type="textarea"
+            disabled={!user}
           />
           <div className="self-end">
             <Button text="Comment" size="sm" rounded />
