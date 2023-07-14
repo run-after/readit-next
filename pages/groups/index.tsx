@@ -24,6 +24,7 @@ export default function Groups() {
   // Local state
   const [groups, setGroups] = useState<Group[]>([]);
 
+  // TODO: Move into helper
   const handleJoinGroup = async (
     group: string,
     e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
@@ -113,8 +114,8 @@ export default function Groups() {
     <Main>
       <div className="flex flex-col gap-4">
         {groups?.map((group) => (
-          <button
-            className="border hover:opacity-80 p-4 flex gap-8 justify-between items-center"
+          <div
+            className="border hover:opacity-80 cursor-pointer p-4 flex gap-8 justify-between items-center"
             key={group.id}
             onClick={(e) => handleNavigate(e, `/groups/${group.id}`)}
           >
@@ -124,19 +125,20 @@ export default function Groups() {
                 {group.description}
               </p>
             </div>
-
-            <Button
-              text={user?.groups.includes(group.id) ? "Leave" : "Join"}
-              onClick={
-                user?.groups.includes(group.id)
-                  ? (e) => handleLeaveGroup(group.id, e)
-                  : (e) => handleJoinGroup(group.id, e)
-              }
-              color="gray"
-              size="sm"
-              rounded
-            />
-          </button>
+            {user && (
+              <Button
+                text={user?.groups.includes(group.id) ? "Leave" : "Join"}
+                onClick={
+                  user?.groups.includes(group.id)
+                    ? (e) => handleLeaveGroup(group.id, e)
+                    : (e) => handleJoinGroup(group.id, e)
+                }
+                color="gray"
+                size="sm"
+                rounded
+              />
+            )}
+          </div>
         ))}
       </div>
     </Main>
