@@ -88,6 +88,14 @@ export default function Groups() {
     router.replace(url);
   };
 
+  // TODO: Wire up
+  const createGroup = async () => {
+    try {
+    } catch (e) {
+      console.log("e", e);
+    }
+  };
+
   const getGroups = async () => {
     try {
       let arr: Group[] = [];
@@ -112,34 +120,46 @@ export default function Groups() {
   // List all the groups
   return (
     <Main>
-      <div className="flex flex-col gap-4">
-        {groups?.map((group) => (
-          <div
-            className="border hover:opacity-80 cursor-pointer p-4 flex gap-8 justify-between items-center"
-            key={group.id}
-            onClick={(e) => handleNavigate(e, `/groups/${group.id}`)}
-          >
-            <div className="flex flex-col items-start">
-              <h6 className="font-bold capitalize">{group.id}</h6>
-              <p className="text-gray-400 text-start text-sm">
-                {group.description}
-              </p>
+      {/* Main section */}
+      <div className="flex gap-4 items-start">
+        <div className="flex flex-col gap-4">
+          {groups?.map((group) => (
+            <div
+              className="border hover:opacity-80 cursor-pointer p-4 ml-2 flex gap-8 justify-between items-center"
+              key={group.id}
+              onClick={(e) => handleNavigate(e, `/groups/${group.id}`)}
+            >
+              <div className="flex flex-col items-start">
+                <h6 className="font-bold capitalize">{group.id}</h6>
+                <p className="text-gray-400 text-start text-sm">
+                  {group.description}
+                </p>
+              </div>
+              {user && (
+                <Button
+                  text={user?.groups.includes(group.id) ? "Leave" : "Join"}
+                  onClick={
+                    user?.groups.includes(group.id)
+                      ? (e) => handleLeaveGroup(group.id, e)
+                      : (e) => handleJoinGroup(group.id, e)
+                  }
+                  color="gray"
+                  size="sm"
+                  rounded
+                />
+              )}
             </div>
-            {user && (
-              <Button
-                text={user?.groups.includes(group.id) ? "Leave" : "Join"}
-                onClick={
-                  user?.groups.includes(group.id)
-                    ? (e) => handleLeaveGroup(group.id, e)
-                    : (e) => handleJoinGroup(group.id, e)
-                }
-                color="gray"
-                size="sm"
-                rounded
-              />
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
+        {/* Create group section */}
+        <div className="py-4 px-8 space-y-4 border w-1/4">
+          <h6 className="font-bold text-lg">Create group</h6>
+          <p>
+            If you don't see a group that you're looking for, you can create
+            your own group here...
+          </p>
+          <Button text="Create group" rounded onClick={createGroup} />
+        </div>
       </div>
     </Main>
   );
