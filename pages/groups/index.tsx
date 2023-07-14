@@ -80,7 +80,7 @@ export default function Groups() {
   };
 
   const handleNavigate = (
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>,
+    e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
     url: string
   ) => {
     e.stopPropagation();
