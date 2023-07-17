@@ -18,9 +18,9 @@ export default function Modal({ onClose, children, heading }: IModal) {
 
   return (
     <div className="fixed top-0 left-0 h-screen w-screen flex justify-center items-center backdrop-blur-sm cursor-auto z-20">
-      <div className="w-3/4 h-5/6 overflow-y-auto bg-black border border-gray-700 rounded relative cursor-auto flex flex-col">
+      <div className="w-full h-full md:w-3/4 md:h-5/6 overflow-y-auto bg-black border border-gray-700 rounded relative cursor-auto flex flex-col">
         {/* Heading */}
-        <div className="w-full h-12 flex gap-4 items-center px-4">
+        <div className="w-full h-12 flex flex-wrap gap-4 items-center px-4">
           <div className="flex-1 py-2">{heading}</div>
           <p
             className="text-black cursor-pointer hover:opacity-50"
