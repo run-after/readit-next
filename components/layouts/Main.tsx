@@ -1,13 +1,20 @@
 import Header from "@/components/layouts/Header";
 import Sidebar from "@/components/layouts/Sidebar";
+import { ReactNode } from "react";
 
-export default function Main({ children }) {
+interface MainProp {
+  children: ReactNode;
+}
+
+export default function Main({ children }: MainProp) {
   return (
     <div className="bg-black h-full min-h-screen">
       <Header />
-      <Sidebar />
-      {/* This needs to be dynamic based on */}
-      <div className="pt-16 ml-32 text-white h-full">{children}</div>
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
+
+      <div className="pt-16 md:ml-32 text-white h-full">{children}</div>
     </div>
   );
 }
