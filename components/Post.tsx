@@ -33,6 +33,7 @@ type HeadingProp = {
   handleUpVote: MouseEventHandler<HTMLButtonElement>;
   handleDownVote: MouseEventHandler<HTMLButtonElement>;
   likeCount: number;
+  fullPost: boolean;
 };
 
 const Heading = ({
@@ -40,18 +41,19 @@ const Heading = ({
   handleUpVote,
   handleDownVote,
   likeCount,
+  fullPost,
 }: HeadingProp) => {
   // Access context
   const { user } = useSession();
 
   return (
-    <div className="flex gap-4 text-white">
+    <div className={`${fullPost ? "text-xl" : ""} flex gap-4 text-white`}>
       <div className="flex gap-2 items-center border-r border-gray-700 pr-4">
         <button onClick={handleDownVote}>
           <ArrowDownCircleIcon
             className={`${
               user?.hates.includes(post.id) ? "text-orange-400" : ""
-            } h-4 w-4 hover:opacity-70`}
+            } ${fullPost ? "h-6 w-6" : "h-4 w-4"} hover:opacity-70`}
           />
         </button>
         <span>{likeCount}</span>
@@ -59,7 +61,7 @@ const Heading = ({
           <ArrowUpCircleIcon
             className={`${
               user?.likes.includes(post.id) ? "text-green-400" : ""
-            } h-4 w-4 hover:opacity-70`}
+            } ${fullPost ? "h-6 w-6" : "h-4 w-4"} hover:opacity-70`}
           />
         </button>
       </div>
@@ -314,6 +316,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
                 handleDownVote={handleDownVote}
                 likeCount={likeCount}
                 post={post}
+                fullPost
               />
             }
             onClose={() => {
