@@ -231,6 +231,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
 
   return (
     <div className="flex gap-6 p-4 border border-gray-800 hover:border-white">
+      {/* Left side vote section */}
       <div className="flex flex-col gap-1 items-center">
         <button onClick={handleUpVote}>
           <ArrowUpCircleIcon
@@ -253,8 +254,8 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
         onClick={!showFullPost ? handlePostSelect : undefined}
       >
         {/* Heading */}
-        <div className="flex justify-between gap-2 items-center">
-          <div className="flex gap-2 items-center">
+        <div className="flex justify-between gap-2 items-start">
+          <div className="flex flex-wrap gap-2 items-center">
             {/* TODO: Add image to group */}
             <div className="rounded-full h-6 w-6 bg-red-400" />
             <LocalLink
