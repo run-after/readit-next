@@ -42,10 +42,10 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
     let imageURL = null;
 
     // Check for errors
-    if (!titleInput.value) errors.push("titleError");
+    if (!titleInput?.value) errors.push("titleError");
     if (!contentInput?.value && postType === "text")
       errors.push("contentError");
-    if (!groupInput.value) errors.push("groupError");
+    if (!groupInput?.value) errors.push("groupError");
     if (postType === "image") {
       if (!image || image.size > 2000000) errors.push("imageError");
     }
@@ -138,7 +138,7 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
 
       <form className="space-y-4" onSubmit={handleCreatePost}>
         <Input
-          name="title"
+          name="titleInput"
           placeholder="Title"
           error={errorArr.includes("titleError")}
           onChange={() =>
@@ -149,7 +149,7 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
         {postType === "text" ? (
           <Input
             type="textarea"
-            name="content"
+            name="contentInput"
             placeholder="Content"
             error={errorArr.includes("contentError")}
             onChange={() =>
@@ -167,7 +167,7 @@ export default function CreatePost({ group, closeModal }: ICreatePost) {
 
         <div className="flex gap-2 justify-end">
           <select
-            name="group"
+            name="groupInput"
             className="bg-black border px-2 py-1 flex-1"
             value={`${selectedGroup}`}
             onChange={(e) => setSelectedGroup(e.target.value)}
