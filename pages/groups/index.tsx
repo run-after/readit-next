@@ -121,7 +121,7 @@ export default function Groups() {
   return (
     <Main>
       {/* Main section */}
-      <div className="flex gap-4 items-start">
+      <div className="flex flex-col-reverse lg:flex-row gap-4 items-start">
         <div className="flex flex-col gap-4">
           {groups?.map((group) => (
             <div
@@ -156,8 +156,8 @@ export default function Groups() {
           ))}
         </div>
         {/* Create group section */}
-        <div className="py-4 px-8 space-y-4 border w-1/4">
-          <h6 className="font-bold text-lg">Create group</h6>
+        <div className="py-4 px-8 space-y-4 w-full lg:w-1/4">
+          <h6 className="font-bold text-lg">New group</h6>
           <p>
             If you don't see a group that you're looking for, you can create
             your own group here...
