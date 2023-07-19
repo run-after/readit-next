@@ -53,7 +53,7 @@ const Heading = ({
           <ArrowDownCircleIcon
             className={`${
               user?.hates.includes(post.id) ? "text-orange-400" : ""
-            } ${fullPost ? "h-6 w-6" : "h-4 w-4"} hover:opacity-70`}
+            } h-4 w-4 hover:opacity-70`}
           />
         </button>
         <span>{likeCount}</span>
@@ -61,7 +61,7 @@ const Heading = ({
           <ArrowUpCircleIcon
             className={`${
               user?.likes.includes(post.id) ? "text-green-400" : ""
-            } ${fullPost ? "h-6 w-6" : "h-4 w-4"} hover:opacity-70`}
+            } h-4 w-4 hover:opacity-70`}
           />
         </button>
       </div>
