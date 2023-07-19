@@ -129,8 +129,12 @@ export default function Groups() {
               key={group.id}
               onClick={(e) => handleNavigate(e, `/groups/${group.id}`)}
             >
-              <div className="flex flex-col items-start">
-                <h6 className="font-bold capitalize">{group.id}</h6>
+              <div className="flex flex-col items-start gap-2">
+                <div className="flex gap-2">
+                  {/* TODO: Add image to group */}
+                  <div className="rounded-full h-6 w-6 bg-red-400" />
+                  <h6 className="font-bold capitalize">{group.id}</h6>
+                </div>
                 <p className="text-gray-400 text-start text-sm">
                   {group.description}
                 </p>
