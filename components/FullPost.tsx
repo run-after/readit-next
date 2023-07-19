@@ -156,13 +156,17 @@ export default function FullPost({ post, comments, getComments }: PostProps) {
         <form className="flex flex-col gap-4" onSubmit={handleSubmitComment}>
           <Input
             name="comment"
-            placeholder="What are your thoughts?"
-            label={user ? `Comment as ${user.displayName}` : "Leave a comment"}
+            placeholder={user ? "What are your thoughts?" : "Please sign in"}
+            label={
+              user
+                ? `Comment as ${user.displayName}`
+                : "Sign in to leave a comment"
+            }
             type="textarea"
             disabled={!user}
           />
           <div className="self-end">
-            <Button text="Comment" size="sm" rounded />
+            <Button text="Comment" size="sm" rounded disabled={!user} />
           </div>
         </form>
       </div>
