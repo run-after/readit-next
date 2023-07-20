@@ -1,5 +1,5 @@
 import { collection, doc, getDocs, setDoc } from "firebase/firestore";
-import { useEffect, useState, MouseEvent } from "react";
+import { useEffect, useState, MouseEvent, FormEvent } from "react";
 import { useRouter } from "next/router";
 
 import { useFirebase } from "@/contexts/firebase";
@@ -7,6 +7,8 @@ import { useSession } from "@/contexts/session";
 
 import Button from "@/components/Button";
 import Main from "@/components/layouts/Main";
+import Modal from "@/components/Modal";
+import Input from "@/components/Input";
 
 type Group = {
   description: string;
@@ -23,6 +25,8 @@ export default function Groups() {
 
   // Local state
   const [groups, setGroups] = useState<Group[]>([]);
+  const [showGroupModal, setShowGroupModal] = useState<Boolean>(false);
+  const [errorArr, setErrorArr] = useState<String[]>([]);
 
   // TODO: Move into helper
   const handleJoinGroup = async (
@@ -88,9 +92,32 @@ export default function Groups() {
     router.replace(url);
   };
 
-  // TODO: Wire up
-  const createGroup = async () => {
+  const createGroup = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    let errors = [];
+
+    // Destructure inputs
+    const { groupName, description } = e.currentTarget;
+
+    // Check for errors
+    if (!groupName?.value) errors.push("nameError");
+    if (!description?.value) errors.push("descriptionError");
+
+    // Do not submit if errors
+    if (errors.length > 0) {
+      setErrorArr(errors);
+      return;
+    }
+
     try {
+      // Create group
+      await setDoc(doc(db, "groups", groupName.value), {
+        description: description.value,
+      });
+
+      // Redirect to new group page
+      router.replace(`groups/${groupName.value}`);
     } catch (e) {
       console.log("e", e);
     }
@@ -162,9 +189,51 @@ export default function Groups() {
             If you don't see a group that you're looking for, you can create
             your own group here...
           </p>
-          <Button text="Create group" rounded onClick={createGroup} />
+          <Button
+            text="Create group"
+            rounded
+            onClick={() => setShowGroupModal(true)}
+            disabled={!user}
+          />
         </div>
       </div>
+      {showGroupModal && (
+        <Modal
+          heading={
+            <h1 className="text-xl font-bold px-4 py-2">Create Group</h1>
+          }
+          onClose={() => {
+            setShowGroupModal(false);
+          }}
+        >
+          {/* TODO: Better layout */}
+          <form className="space-y-4 p-4 text-right" onSubmit={createGroup}>
+            {/* TODO: Add image uploader */}
+            <Input
+              name="groupName"
+              placeholder="Group name"
+              error={errorArr.includes("nameError")}
+              onChange={() =>
+                setErrorArr(errorArr.filter((err) => err !== "nameError"))
+              }
+            />
+            <Input
+              type="textarea"
+              name="description"
+              placeholder="Description"
+              error={errorArr.includes("descriptionError")}
+              onChange={() =>
+                setErrorArr(
+                  errorArr.filter((err) => err !== "descriptionError")
+                )
+              }
+            />
+            <Button rounded text="Create" disabled={errorArr.length > 0} />
+          </form>
+        </Modal>
+      )}
     </Main>
   );
 }
+
+// TODO: Add loader
