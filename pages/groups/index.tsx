@@ -216,6 +216,7 @@ export default function Groups() {
               onChange={() =>
                 setErrorArr(errorArr.filter((err) => err !== "nameError"))
               }
+              maxLength={25}
             />
             <Input
               type="textarea"
