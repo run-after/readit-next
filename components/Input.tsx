@@ -6,6 +6,7 @@ interface Input {
   error?: boolean;
   onChange?: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
   disabled?: boolean;
+  maxLength?: number;
 }
 
 export default function Input({
@@ -16,6 +17,7 @@ export default function Input({
   error,
   onChange,
   disabled,
+  maxLength,
 }: Input) {
   if (type === "textarea")
     return (
@@ -29,6 +31,7 @@ export default function Input({
           placeholder={placeholder}
           onChange={onChange}
           disabled={disabled}
+          maxLength={maxLength}
         />
       </div>
     );
@@ -45,6 +48,7 @@ export default function Input({
         placeholder={placeholder}
         onChange={onChange}
         disabled={disabled}
+        maxLength={maxLength}
       />
     </div>
   );
