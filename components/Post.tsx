@@ -1,4 +1,4 @@
-import { useState, MouseEvent, MouseEventHandler, useEffect } from "react";
+import { useState, MouseEventHandler, useEffect } from "react";
 import {
   doc,
   setDoc,
@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import { IComment, IPost } from "@/interfaces";
 import { useSession } from "@/contexts/session";
 import { useFirebase } from "@/contexts/firebase";
+import { useGroupStatus } from "@/hooks/groupStatus";
 
 import Button from "./Button";
 import Modal from "./Modal";
@@ -78,6 +79,9 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   const { user, setUser } = useSession();
   const { db } = useFirebase();
 
+  // Access hooks
+  const { handleJoinGroup, handleLeaveGroup } = useGroupStatus();
+
   // Local state
   const [showFullPost, setShowFullPost] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
@@ -86,59 +90,6 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   const handlePostSelect = () => {
     // Open modal with post info inside
     if (!showFullPost) setShowFullPost(true);
-  };
-
-  const handleJoinGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Copy user groups
-    const tempGroups = [...user.groups];
-
-    // Push new group
-    tempGroups.push(group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
-  };
-
-  const handleLeaveGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Copy user groups
-    const tempGroups = [...user.groups].filter((x) => x !== group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
   };
 
   const handleUpVote = async () => {
