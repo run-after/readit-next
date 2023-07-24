@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState, useEffect, MouseEvent } from "react";
+import { useState, useEffect } from "react";
 import {
   collection,
   query,
@@ -7,12 +7,12 @@ import {
   getDocs,
   doc,
   getDoc,
-  setDoc,
 } from "firebase/firestore";
 
 import { useSession } from "@/contexts/session";
 import { useFirebase } from "@/contexts/firebase";
 import { IPost } from "@/interfaces";
+import { useGroupStatus } from "@/hooks/groupStatus";
 
 import Main from "@/components/layouts/Main";
 import Button from "@/components/Button";
@@ -33,65 +33,13 @@ export default function Group() {
   const { user, setUser } = useSession();
   const { db } = useFirebase();
 
+  // Access hooks
+  const { handleJoinGroup, handleLeaveGroup } = useGroupStatus();
+
   // Local state
   const [posts, setPosts] = useState<IPost[]>([]);
   const [groupDescription, setGroupDescription] = useState<IGroup>();
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
-
-  // TODO: Move into helper
-  const handleJoinGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Copy user groups
-    const tempGroups = [...user.groups];
-
-    // Push new group
-    tempGroups.push(group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
-  };
-
-  // TODO: Move into helper
-  const handleLeaveGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Copy user groups
-    const tempGroups = [...user.groups].filter((x) => x !== group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
-  };
 
   const handleCloseModal = () => {
     getPosts();
