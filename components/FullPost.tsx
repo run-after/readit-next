@@ -1,10 +1,11 @@
-import { MouseEvent, ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 import { useRouter } from "next/router";
-import { setDoc, doc, collection, addDoc } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 
 import { useSession } from "@/contexts/session";
 import { useFirebase } from "@/contexts/firebase";
 import { IComment, IPost } from "@/interfaces";
+import { useGroupStatus } from "@/hooks/groupStatus";
 
 import Button from "./Button";
 import Input from "./Input";
@@ -18,66 +19,15 @@ interface PostProps {
 }
 
 export default function FullPost({ post, comments, getComments }: PostProps) {
+  // Access router
   const router = useRouter();
 
   // Access contexts
   const { user, setUser } = useSession();
   const { db } = useFirebase();
 
-  // TODO: Move into helper
-  const handleJoinGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Copy user groups
-    const tempGroups = [...user.groups];
-
-    // Push new group
-    tempGroups.push(group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
-  };
-
-  // TODO: Move into helper
-  const handleLeaveGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Copy user groups
-    const tempGroups = [...user.groups].filter((x) => x !== group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
-  };
+  // Access hooks
+  const { handleJoinGroup, handleLeaveGroup } = useGroupStatus();
 
   const handleSubmitComment = async (e: ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
