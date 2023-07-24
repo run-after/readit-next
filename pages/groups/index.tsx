@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 
 import { useFirebase } from "@/contexts/firebase";
 import { useSession } from "@/contexts/session";
+import { useGroupStatus } from "@/hooks/groupStatus";
 
 import Button from "@/components/Button";
 import Main from "@/components/layouts/Main";
@@ -21,67 +22,15 @@ export default function Groups() {
 
   // Access contexts
   const { db } = useFirebase();
-  const { user, setUser } = useSession();
+  const { user } = useSession();
+
+  // Access hooks
+  const { handleJoinGroup, handleLeaveGroup } = useGroupStatus();
 
   // Local state
   const [groups, setGroups] = useState<Group[]>([]);
   const [showGroupModal, setShowGroupModal] = useState<Boolean>(false);
   const [errorArr, setErrorArr] = useState<String[]>([]);
-
-  // TODO: Move into helper
-  const handleJoinGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Copy user groups
-    const tempGroups = [...user.groups];
-
-    // Push new group
-    tempGroups.push(group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
-  };
-
-  // TODO: Move into helper
-  const handleLeaveGroup = async (
-    group: string,
-    e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
-  ) => {
-    // Stop parent element onClick
-    e.stopPropagation();
-
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Copy user groups
-    const tempGroups = [...user.groups].filter((x) => x !== group);
-
-    // Update user
-    await setDoc(doc(db, "users", user.displayName), {
-      ...user,
-      groups: tempGroups,
-    });
-
-    // Update user context
-    setUser({ ...user, groups: tempGroups });
-  };
 
   const handleNavigate = (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
