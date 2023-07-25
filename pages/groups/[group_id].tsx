@@ -19,6 +19,7 @@ import Button from "@/components/Button";
 import PostFeed from "@/components/PostFeed";
 import Modal from "@/components/Modal";
 import CreatePost from "@/components/CreatePost";
+import Error from "@/components/Error";
 
 export interface IGroup {
   description: string;
@@ -30,7 +31,7 @@ export default function Group() {
   const { group_id } = router.query;
 
   // Access context
-  const { user, setUser } = useSession();
+  const { user } = useSession();
   const { db } = useFirebase();
 
   // Access hooks
@@ -40,6 +41,8 @@ export default function Group() {
   const [posts, setPosts] = useState<IPost[]>([]);
   const [groupDescription, setGroupDescription] = useState<IGroup>();
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
+  const [showErrorPage, setShowErrorPage] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleCloseModal = () => {
     getPosts();
@@ -69,7 +72,12 @@ export default function Group() {
     try {
       const docRef = doc(db, "groups", group_id as string);
       const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) setGroupDescription(docSnap.data() as IGroup);
+      if (docSnap.data()) {
+        setGroupDescription(docSnap.data() as IGroup);
+      } else {
+        setShowErrorPage(true);
+      }
+      setLoading(false);
     } catch (e) {
       console.log("err", e);
     }
@@ -82,6 +90,17 @@ export default function Group() {
       getGroupDetails();
     }
   }, [group_id]);
+
+  if (loading)
+    return (
+      <Main>
+        <div className="flex justify-center">
+          <img src="/loading.gif" />
+        </div>
+      </Main>
+    );
+
+  if (showErrorPage) return <Error />;
 
   return (
     <Main>
