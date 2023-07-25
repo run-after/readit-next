@@ -185,5 +185,3 @@ export default function Groups() {
     </Main>
   );
 }
-
-// TODO: Add loader
