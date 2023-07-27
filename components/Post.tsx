@@ -70,19 +70,18 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   const [likeCount, setLikeCount] = useState(post.likes);
   const [comments, setComments] = useState<IComment[]>([]);
 
-  const { handleUpVote, handleDownVote } = useVoting({
-    content: post,
-    type: "posts",
-    likeCount,
-    setLikeCount,
-  });
-
   // Access contexts
   const { user } = useSession();
   const { db } = useFirebase();
 
   // Access hooks
   const { handleJoinGroup, handleLeaveGroup } = useGroupStatus();
+  const { handleUpVote, handleDownVote } = useVoting({
+    content: post,
+    type: "posts",
+    likeCount,
+    setLikeCount,
+  });
 
   const handlePostSelect = () => {
     // Open modal with post info inside
