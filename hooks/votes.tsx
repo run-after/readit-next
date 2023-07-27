@@ -8,10 +8,11 @@ import { IComment, IPost } from "@/interfaces";
 type VoteProp = {
   content: IPost | IComment;
   type: string;
+  likeCount: number;
+  setLikeCount: Function;
 };
 
-// VV: need to pass setLikeCount && likeCount into here?
-function useVoting() {
+function useVoting({ content, type, likeCount, setLikeCount }: VoteProp) {
   // Access router
   const router = useRouter();
 
@@ -20,7 +21,7 @@ function useVoting() {
 
   const { db } = useFirebase();
 
-  const handleUpVote = async ({ content, type }: VoteProp) => {
+  const handleUpVote = async () => {
     // Redirect to login if no user
     if (!user) {
       router.replace("/login");
@@ -53,8 +54,7 @@ function useVoting() {
     }
   };
 
-  // VV: need to pass setLikeCount && likeCount into here?
-  const handleDownVote = async ({ content, type }: VoteProp) => {
+  const handleDownVote = async () => {
     // Redirect to login if no user
     if (!user) {
       router.replace("/login");
@@ -92,5 +92,3 @@ function useVoting() {
 }
 
 export { useVoting };
-
-// TODO: setLikeCount && likeCount
