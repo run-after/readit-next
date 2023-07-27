@@ -2,13 +2,11 @@ import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/solid";
-import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
-import { useRouter } from "next/router";
 
 import { IComment } from "@/interfaces";
 import { useSession } from "@/contexts/session";
-import { useFirebase } from "@/contexts/firebase";
+import { useVoting } from "@/hooks/votes";
 
 import LocalLink from "./LocalLink";
 
@@ -18,81 +16,18 @@ interface CommentProp {
 
 export default function Comment({ comment }: CommentProp) {
   // Access contexts
-  const { user, setUser } = useSession();
-  const { db } = useFirebase();
-
-  // Access router
-  const router = useRouter();
+  const { user } = useSession();
 
   // Local state
   const [likeCount, setLikeCount] = useState(comment.likes);
 
-  const handleUpVote = async () => {
-    // Redirect to login if no user
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Don't allow more than 1 upvote
-    if (user.likes.includes(comment.id)) return;
-    try {
-      // Update comment with a like
-      await setDoc(doc(db, "comments", comment.id), {
-        ...comment,
-        likes: comment.likes + 1,
-      });
-
-      const tempUser = {
-        ...user,
-        likes: [...user.likes, comment.id],
-        hates: user.hates.filter((hatedComment) => hatedComment !== comment.id),
-      };
-
-      // Update user with a like
-      await setDoc(doc(db, "users", user.displayName), tempUser);
-
-      setUser(tempUser);
-
-      // Update like count
-      setLikeCount(likeCount + 1);
-    } catch (e) {
-      console.log("err", e);
-    }
-  };
-
-  const handleDownVote = async () => {
-    // Redirect to login if no user
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Don't allow more than 1 downvote
-    if (user.hates.includes(comment.id)) return;
-    try {
-      // Update comment with a like
-      await setDoc(doc(db, "comments", comment.id), {
-        ...comment,
-        likes: comment.likes - 1,
-      });
-
-      const tempUser = {
-        ...user,
-        hates: [...user.hates, comment.id],
-        likes: user.likes.filter((likedComment) => likedComment !== comment.id),
-      };
-
-      // Update user with a like
-      await setDoc(doc(db, "users", user.displayName), tempUser);
-      setUser(tempUser);
-
-      // Update like count
-      setLikeCount(likeCount - 1);
-    } catch (e) {
-      console.log("err", e);
-    }
-  };
+  // Access hook
+  const { handleUpVote, handleDownVote } = useVoting({
+    content: comment,
+    type: "comments",
+    likeCount,
+    setLikeCount,
+  });
 
   return (
     <div className="space-y-1">
