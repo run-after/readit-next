@@ -1,23 +1,16 @@
 import { useState, MouseEventHandler, useEffect } from "react";
-import {
-  doc,
-  setDoc,
-  query,
-  collection,
-  getDocs,
-  where,
-} from "firebase/firestore";
+import { query, collection, getDocs, where } from "firebase/firestore";
 import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
 } from "@heroicons/react/24/solid";
 import { ChatBubbleLeftIcon } from "@heroicons/react/24/outline";
-import { useRouter } from "next/router";
 
 import { IComment, IPost } from "@/interfaces";
 import { useSession } from "@/contexts/session";
 import { useFirebase } from "@/contexts/firebase";
 import { useGroupStatus } from "@/hooks/groupStatus";
+import { useVoting } from "@/hooks/votes";
 
 import Button from "./Button";
 import Modal from "./Modal";
@@ -72,91 +65,28 @@ const Heading = ({
 };
 
 export default function Post({ post, showGroupButton = true }: PostProp) {
-  // Access router
-  const router = useRouter();
-
-  // Access contexts
-  const { user, setUser } = useSession();
-  const { db } = useFirebase();
-
-  // Access hooks
-  const { handleJoinGroup, handleLeaveGroup } = useGroupStatus();
-
   // Local state
   const [showFullPost, setShowFullPost] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
   const [comments, setComments] = useState<IComment[]>([]);
 
+  const { handleUpVote, handleDownVote } = useVoting({
+    content: post,
+    type: "posts",
+    likeCount,
+    setLikeCount,
+  });
+
+  // Access contexts
+  const { user } = useSession();
+  const { db } = useFirebase();
+
+  // Access hooks
+  const { handleJoinGroup, handleLeaveGroup } = useGroupStatus();
+
   const handlePostSelect = () => {
     // Open modal with post info inside
     if (!showFullPost) setShowFullPost(true);
-  };
-
-  const handleUpVote = async () => {
-    // Redirect to login if no user
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Don't allow more than 1 upvote
-    if (user.likes.includes(post.id)) return;
-    try {
-      // Update post with a like
-      await setDoc(doc(db, "posts", post.id), {
-        ...post,
-        likes: post.likes + 1,
-      });
-
-      const tempUser = {
-        ...user,
-        likes: [...user.likes, post.id],
-        hates: user.hates.filter((hatedPost) => hatedPost !== post.id),
-      };
-
-      // Update user with a like
-      await setDoc(doc(db, "users", user.displayName), tempUser);
-      setUser(tempUser);
-
-      // Update like count
-      setLikeCount(likeCount + 1);
-    } catch (e) {
-      console.log("err", e);
-    }
-  };
-
-  const handleDownVote = async () => {
-    // Redirect to login if no user
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-
-    // Don't allow more than 1 downvote
-    if (user.hates.includes(post.id)) return;
-
-    try {
-      // Update post with a like
-      await setDoc(doc(db, "posts", post.id), {
-        ...post,
-        likes: post.likes - 1,
-      });
-
-      const tempUser = {
-        ...user,
-        hates: [...user.hates, post.id],
-        likes: user.likes.filter((likedPost) => likedPost !== post.id),
-      };
-
-      // Update user with a like
-      await setDoc(doc(db, "users", user.displayName), tempUser);
-      setUser(tempUser);
-
-      // Update like count
-      setLikeCount(likeCount - 1);
-    } catch (e) {
-      console.log("err", e);
-    }
   };
 
   // TODO: Move to helper
