@@ -97,17 +97,21 @@ export default function Groups() {
     getGroups();
   }, []);
 
+  if (loading)
+    return (
+      <Main>
+        <div className="flex justify-center">
+          <img src="/loading.gif" />
+        </div>
+      </Main>
+    );
+
   // List all the groups
   return (
     <Main>
       {/* Main section */}
       <div className="flex flex-col-reverse lg:flex-row gap-4 items-start">
         <div className="flex flex-col gap-4 w-3/4">
-          {loading && (
-            <div className="flex justify-center">
-              <img src="/loading.gif" />
-            </div>
-          )}
           {groups?.map((group) => (
             <div
               className="border hover:opacity-80 cursor-pointer p-4 ml-2 flex gap-8 justify-between items-center"
