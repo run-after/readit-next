@@ -31,6 +31,7 @@ export default function Groups() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [showGroupModal, setShowGroupModal] = useState<Boolean>(false);
   const [errorArr, setErrorArr] = useState<String[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const handleNavigate = (
     e: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
@@ -84,6 +85,9 @@ export default function Groups() {
         arr.push({ description, id: group.id });
       });
       setGroups(arr);
+
+      // End loading
+      setLoading(false);
     } catch (e) {
       console.log("e", e);
     }
@@ -98,7 +102,12 @@ export default function Groups() {
     <Main>
       {/* Main section */}
       <div className="flex flex-col-reverse lg:flex-row gap-4 items-start">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 w-3/4">
+          {loading && (
+            <div className="flex justify-center">
+              <img src="/loading.gif" />
+            </div>
+          )}
           {groups?.map((group) => (
             <div
               className="border hover:opacity-80 cursor-pointer p-4 ml-2 flex gap-8 justify-between items-center"
