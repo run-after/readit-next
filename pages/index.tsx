@@ -3,6 +3,7 @@ import { getDocs, collection } from "firebase/firestore";
 
 import { useFirebase } from "@/contexts/firebase";
 import { IPost } from "@/interfaces";
+import { useSession } from "@/contexts/session";
 
 import Main from "@/components/layouts/Main";
 import PostFeed from "@/components/PostFeed";
@@ -12,8 +13,9 @@ export default function Home() {
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Access context
+  // Access contexts
   const { db } = useFirebase();
+  const { user } = useSession();
 
   const getPosts = async () => {
     try {
@@ -21,13 +23,20 @@ export default function Home() {
 
       // Get posts
       const querySnapshot = await getDocs(collection(db, "posts"));
+
       // Add id to each post
       querySnapshot.forEach((doc) => {
         const post = { ...doc.data(), id: doc.id };
         arr.push(post as IPost);
       });
 
+      // If user belongs to at least 1 group, personalize feed
+      if (user?.groups.length)
+        arr = arr.filter((post) => user?.groups.includes(post.group));
+
       setAllPosts(arr.sort((x, y) => y.timestamp - x.timestamp));
+
+      // End loaing
       setLoading(false);
     } catch (e) {
       console.log("err", e);
@@ -55,4 +64,4 @@ export default function Home() {
 }
 
 // TODO:
-// Add personalized feed
+// Pagination
