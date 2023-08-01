@@ -53,14 +53,25 @@ export default function Group() {
     try {
       let arr: IPost[] = [];
 
-      // Get all group posts
-      const querySnapshot = await getDocs(
-        query(collection(db, "posts"), where("group", "==", group_id))
-      );
-      querySnapshot.forEach((doc) => {
-        const post = { ...doc.data(), id: doc.id };
-        arr.push(post as IPost);
-      });
+      if (group_id === "all") {
+        // Get posts
+        const querySnapshot = await getDocs(collection(db, "posts"));
+
+        // Add id to each post
+        querySnapshot.forEach((doc) => {
+          const post = { ...doc.data(), id: doc.id };
+          arr.push(post as IPost);
+        });
+      } else {
+        // Get all group posts
+        const querySnapshot = await getDocs(
+          query(collection(db, "posts"), where("group", "==", group_id))
+        );
+        querySnapshot.forEach((doc) => {
+          const post = { ...doc.data(), id: doc.id };
+          arr.push(post as IPost);
+        });
+      }
 
       setPosts(arr.sort((x, y) => y.timestamp - x.timestamp));
     } catch (e) {
@@ -72,7 +83,7 @@ export default function Group() {
     try {
       const docRef = doc(db, "groups", group_id as string);
       const docSnap = await getDoc(docRef);
-      if (docSnap.data()) {
+      if (docSnap.data() || group_id === "all") {
         setGroupDescription(docSnap.data() as IGroup);
       } else {
         setShowErrorPage(true);
@@ -135,20 +146,30 @@ export default function Group() {
         {/* Feed */}
         <PostFeed posts={posts} showGroupButtons={false} />
         {/* Community card */}
-        <div className="w-1/4 border border-gray-800 m-4 p-4 rounded space-y-4">
-          <h6 className="text-gray-500 text-bold">About Community</h6>
-          <p className="text-gray-300 text-sm">
-            {groupDescription?.description}
-          </p>
-          <Button
-            disabled={!user}
-            onClick={() => setShowCreatePostModal(true)}
-            text="Create post"
-            color="gray"
-            block
-            rounded
-          />
-        </div>
+        {group_id === "all" ? (
+          <div className="w-1/4 border border-gray-800 m-4 p-4 rounded space-y-4">
+            <h6 className="text-gray-500 text-bold">About Community</h6>
+            <p className="text-gray-300 text-sm">
+              All the posts across all the groups in our community are present
+              here.
+            </p>
+          </div>
+        ) : (
+          <div className="w-1/4 border border-gray-800 m-4 p-4 rounded space-y-4">
+            <h6 className="text-gray-500 text-bold">About Community</h6>
+            <p className="text-gray-300 text-sm">
+              {groupDescription?.description}
+            </p>
+            <Button
+              disabled={!user}
+              onClick={() => setShowCreatePostModal(true)}
+              text="Create post"
+              color="gray"
+              block
+              rounded
+            />
+          </div>
+        )}
       </div>
       {showCreatePostModal && (
         <Modal onClose={() => setShowCreatePostModal(false)}>
