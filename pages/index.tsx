@@ -10,6 +10,7 @@ import PostFeed from "@/components/PostFeed";
 export default function Home() {
   // Local state
   const [allPosts, setAllPosts] = useState<IPost[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Access context
   const { db } = useFirebase();
@@ -27,6 +28,7 @@ export default function Home() {
       });
 
       setAllPosts(arr.sort((x, y) => y.timestamp - x.timestamp));
+      setLoading(false);
     } catch (e) {
       console.log("err", e);
     }
@@ -36,6 +38,15 @@ export default function Home() {
     getPosts();
   }, []);
 
+  if (loading)
+    return (
+      <Main>
+        <div className="flex justify-center">
+          <img src="/loading.gif" />
+        </div>
+      </Main>
+    );
+
   return (
     <Main>
       <PostFeed posts={allPosts} />
@@ -44,5 +55,4 @@ export default function Home() {
 }
 
 // TODO:
-// Add loader
 // Add personalized feed
