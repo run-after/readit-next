@@ -33,7 +33,12 @@ export default function Comment({ comment }: CommentProp) {
     <div className="space-y-1">
       {/* Heading */}
       <div className="flex gap-4 items-center">
-        <LocalLink href={`/users/${comment.user}`} text={comment.user} />
+        <LocalLink
+          href={`/users/${comment.user}`}
+          text={`${comment.user} ${
+            user?.displayName === comment.user ? "(you)" : ""
+          }`}
+        />
         <span className="text-gray-500 text-xs">
           {new Date(comment.timestamp).toLocaleDateString()}
         </span>
