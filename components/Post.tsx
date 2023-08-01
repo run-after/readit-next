@@ -149,7 +149,9 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
             <p className="text-sm opacity-70">
               Posted by:{" "}
               <LocalLink
-                text={post.user}
+                text={`${post.user} ${
+                  user?.displayName === post.user ? "(you)" : ""
+                }`}
                 href={`/users/${post.user}`}
                 onClick={(e) => e.stopPropagation()}
               />{" "}
