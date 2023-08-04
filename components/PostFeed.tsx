@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { IPost } from "@/interfaces";
 import Post from "./Post";
 
@@ -16,6 +18,13 @@ export default function PostFeed({ posts, showGroupButtons }: IPosts) {
           showGroupButton={showGroupButtons}
         />
       ))}
+      <p className="text-white/70">
+        To see more content, join more{" "}
+        <Link href="/groups" className="underline hover:text-white">
+          groups
+        </Link>
+        ...
+      </p>
     </div>
   );
 }
