@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, limit, query, where } from "firebase/firestore";
 
 import { useFirebase } from "@/contexts/firebase";
 import { IPost } from "@/interfaces";
@@ -20,9 +20,20 @@ export default function Home() {
   const getPosts = async () => {
     try {
       let arr: IPost[] = [];
+      let theQuery;
+
+      if (user?.groups.length) {
+        theQuery = query(
+          collection(db, "posts"),
+          where("group", "in", user.groups),
+          limit(10)
+        );
+      } else {
+        theQuery = query(collection(db, "posts"), limit(10));
+      }
 
       // Get posts
-      const querySnapshot = await getDocs(collection(db, "posts"));
+      const querySnapshot = await getDocs(theQuery);
 
       // Add id to each post
       querySnapshot.forEach((doc) => {
@@ -30,13 +41,9 @@ export default function Home() {
         arr.push(post as IPost);
       });
 
-      // If user belongs to at least 1 group, personalize feed
-      if (user?.groups.length)
-        arr = arr.filter((post) => user?.groups.includes(post.group));
-
       setAllPosts(arr.sort((x, y) => y.timestamp - x.timestamp));
 
-      // End loaing
+      // End loading
       setLoading(false);
     } catch (e) {
       console.log("err", e);
@@ -45,7 +52,7 @@ export default function Home() {
 
   useEffect(() => {
     getPosts();
-  }, []);
+  }, [user]);
 
   if (loading)
     return (
