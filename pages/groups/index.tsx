@@ -148,7 +148,7 @@ export default function Groups() {
         <div className="py-4 px-8 space-y-4 w-full lg:w-1/4">
           <h6 className="font-bold text-lg">New group</h6>
           <p>
-            If you don't see a group that you're looking for, you can create
+            If you do not see a group that you are looking for, you can create
             your own group here...
           </p>
           <Button
