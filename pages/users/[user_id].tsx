@@ -7,6 +7,8 @@ import {
   getDocs,
   query,
   where,
+  getCountFromServer,
+  limit,
 } from "firebase/firestore";
 import { useFirebase } from "@/contexts/firebase";
 
@@ -17,6 +19,7 @@ import Main from "@/components/layouts/Main";
 import Comment from "@/components/Comment";
 import FullPost from "@/components/FullPost";
 import Modal from "@/components/Modal";
+import Button from "@/components/Button";
 
 export default function User() {
   // Access router
@@ -31,14 +34,28 @@ export default function User() {
   const [postComments, setPostComments] = useState<IComment[]>([]);
   const [userComments, setUserComments] = useState<IComment[]>([]);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
+  const [numOfPosts, setNumOfPosts] = useState(10);
+  const [displayShowMoreBtn, setDisplayShowMoreBtn] = useState(false);
 
   const getPosts = async () => {
     let postArr: IPost[] = [];
-    try {
-      const snapshot = await getDocs(
-        query(collection(db, "posts"), where("user", "==", user_id))
-      );
 
+    try {
+      // Set query for user posts
+      let theQuery = query(
+        collection(db, "posts"),
+        where("user", "==", user_id)
+      );
+      // Get server count
+      const serverCount = await getCountFromServer(theQuery);
+
+      // Get posts
+      const snapshot = await getDocs(query(theQuery, limit(numOfPosts)));
+
+      // Determine to display show more button
+      setDisplayShowMoreBtn(serverCount.data().count > numOfPosts);
+
+      // Get posts
       snapshot.forEach((doc) => {
         const post = { ...doc.data(), id: doc.id };
         postArr.push(post as IPost);
@@ -108,17 +125,31 @@ export default function User() {
       getPosts();
       getUserComments();
     }
-  }, [user_id]);
+  }, [user_id, numOfPosts]);
 
   return (
     <Main>
-      <div className="flex gap-4 items-start">
-        <div>
+      <div className="flex gap-6 items-start">
+        <div className="w-full">
           {/* Feed */}
           <h3 className="px-12 font-bold text-green-400 text-xl">Posts</h3>
+
           <PostFeed posts={userPosts} showGroupButtons={false} />
+          {displayShowMoreBtn && (
+            <div className="w-full px-12">
+              <Button
+                text="Show more posts"
+                size="sm"
+                color="gray"
+                onClick={() => setNumOfPosts(numOfPosts + 10)}
+              />
+            </div>
+          )}
+
           {/* Comments */}
-          <h3 className="px-12 font-bold text-green-400 text-xl">Comments</h3>
+          <h3 className="px-12 font-bold text-green-400 text-xl mt-8">
+            Comments
+          </h3>
           <div className="p-4 px-12 space-y-6 flex-1">
             {userComments.map((comment) => (
               <div
