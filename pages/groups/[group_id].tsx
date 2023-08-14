@@ -7,6 +7,8 @@ import {
   getDocs,
   doc,
   getDoc,
+  limit,
+  getCountFromServer,
 } from "firebase/firestore";
 
 import { useSession } from "@/contexts/session";
@@ -43,6 +45,8 @@ export default function Group() {
   const [showCreatePostModal, setShowCreatePostModal] = useState(false);
   const [showErrorPage, setShowErrorPage] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [numOfPosts, setNumOfPosts] = useState(10);
+  const [displayShowMoreBtn, setDisplayShowMoreBtn] = useState(false);
 
   const handleCloseModal = () => {
     getPosts();
@@ -52,10 +56,14 @@ export default function Group() {
   const getPosts = async () => {
     try {
       let arr: IPost[] = [];
+      let theQuery;
 
       if (group_id === "all") {
+        // Set query to all posts
+        theQuery = query(collection(db, "posts"));
+
         // Get posts
-        const querySnapshot = await getDocs(collection(db, "posts"));
+        const querySnapshot = await getDocs(query(theQuery, limit(numOfPosts)));
 
         // Add id to each post
         querySnapshot.forEach((doc) => {
@@ -63,15 +71,24 @@ export default function Group() {
           arr.push(post as IPost);
         });
       } else {
-        // Get all group posts
-        const querySnapshot = await getDocs(
-          query(collection(db, "posts"), where("group", "==", group_id))
+        // Set query to posts just in group
+        theQuery = query(
+          collection(db, "posts"),
+          where("group", "==", group_id)
         );
+        // Get all group posts
+        const querySnapshot = await getDocs(query(theQuery, limit(numOfPosts)));
         querySnapshot.forEach((doc) => {
           const post = { ...doc.data(), id: doc.id };
           arr.push(post as IPost);
         });
       }
+
+      // Get server count
+      const serverCount = await getCountFromServer(theQuery);
+
+      // Determine if to display show more btn
+      setDisplayShowMoreBtn(serverCount.data().count > numOfPosts);
 
       setPosts(arr.sort((x, y) => y.timestamp - x.timestamp));
     } catch (e) {
@@ -100,7 +117,7 @@ export default function Group() {
       getPosts();
       getGroupDetails();
     }
-  }, [group_id]);
+  }, [group_id, numOfPosts]);
 
   if (loading)
     return (
@@ -144,7 +161,19 @@ export default function Group() {
       {/* Main section */}
       <div className="flex gap-4 items-start">
         {/* Feed */}
-        <PostFeed posts={posts} showGroupButtons={false} />
+        <div className="w-full">
+          <PostFeed posts={posts} showGroupButtons={false} />
+          {displayShowMoreBtn && (
+            <div className="p-2 px-12">
+              <Button
+                text="Show more posts"
+                size="sm"
+                onClick={() => setNumOfPosts(numOfPosts + 10)}
+              />
+            </div>
+          )}
+        </div>
+
         {/* Community card */}
         {group_id === "all" ? (
           <div className="w-1/4 border border-gray-800 m-4 p-4 rounded space-y-4">
