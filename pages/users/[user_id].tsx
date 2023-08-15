@@ -35,7 +35,9 @@ export default function User() {
   const [userComments, setUserComments] = useState<IComment[]>([]);
   const [selectedPost, setSelectedPost] = useState<IPost | null>(null);
   const [numOfPosts, setNumOfPosts] = useState(10);
-  const [displayShowMoreBtn, setDisplayShowMoreBtn] = useState(false);
+  const [displayMorePostsBtn, setDisplayMorePostsBtn] = useState(false);
+  const [numOfComments, setNumOfComments] = useState(10);
+  const [displayMoreCommentsBtn, setDisplayMoreCommentsBtn] = useState(false);
 
   const getPosts = async () => {
     let postArr: IPost[] = [];
@@ -53,7 +55,7 @@ export default function User() {
       const snapshot = await getDocs(query(theQuery, limit(numOfPosts)));
 
       // Determine to display show more button
-      setDisplayShowMoreBtn(serverCount.data().count > numOfPosts);
+      setDisplayMorePostsBtn(serverCount.data().count > numOfPosts);
 
       // Get posts
       snapshot.forEach((doc) => {
@@ -71,10 +73,23 @@ export default function User() {
   const getComments = async () => {
     try {
       let arr: IComment[] = [];
+      let theQuery = query(
+        collection(db, "comments"),
+        where("post", "==", selectedPost?.id)
+      );
+
+      // Get server count
+      const serverCount = await getCountFromServer(theQuery);
+
+      // Determine to display show more button
+      setDisplayMorePostsBtn(serverCount.data().count > numOfPosts);
+
       // Get all post comments
       const querySnapshot = await getDocs(
-        query(collection(db, "comments"), where("post", "==", selectedPost?.id))
+        query(theQuery, limit(numOfComments))
       );
+
+      // Get comment data
       querySnapshot.forEach((doc) => {
         const temp = { ...doc.data(), id: doc.id };
         arr.push(temp as IComment);
@@ -86,16 +101,20 @@ export default function User() {
     }
   };
 
-  useEffect(() => {
-    getComments();
-  }, []);
-
   const getUserComments = async () => {
     let commentArr: IComment[] = [];
+    let theQuery = query(
+      collection(db, "comments"),
+      where("user", "==", user_id)
+    );
     try {
-      const snapshot = await getDocs(
-        query(collection(db, "comments"), where("user", "==", user_id))
-      );
+      const snapshot = await getDocs(query(theQuery, limit(numOfComments)));
+
+      // Get server count
+      const serverCount = await getCountFromServer(theQuery);
+
+      // Determine to display show more button
+      setDisplayMoreCommentsBtn(serverCount.data().count > numOfComments);
 
       snapshot.forEach((doc) => {
         const comment = { ...doc.data(), id: doc.id };
@@ -121,11 +140,16 @@ export default function User() {
   };
 
   useEffect(() => {
-    if (user_id) {
-      getPosts();
-      getUserComments();
-    }
+    if (selectedPost) getComments();
+  }, [selectedPost]);
+
+  useEffect(() => {
+    if (user_id) getPosts();
   }, [user_id, numOfPosts]);
+
+  useEffect(() => {
+    if (user_id) getUserComments();
+  }, [user_id, numOfComments]);
 
   return (
     <Main>
@@ -135,7 +159,7 @@ export default function User() {
           <h3 className="px-12 font-bold text-green-400 text-xl">Posts</h3>
 
           <PostFeed posts={userPosts} showGroupButtons={false} />
-          {displayShowMoreBtn && (
+          {displayMorePostsBtn && (
             <div className="w-full px-12">
               <Button
                 text="Show more posts"
@@ -162,6 +186,17 @@ export default function User() {
                 <Comment comment={comment} />
               </div>
             ))}
+
+            {displayMoreCommentsBtn && (
+              <div className="w-full ">
+                <Button
+                  text="Show more comments"
+                  size="sm"
+                  color="gray"
+                  onClick={() => setNumOfComments(numOfComments + 10)}
+                />
+              </div>
+            )}
           </div>
         </div>
 
