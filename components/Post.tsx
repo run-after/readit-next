@@ -1,5 +1,12 @@
 import { useState, MouseEventHandler, useEffect } from "react";
-import { query, collection, getDocs, where } from "firebase/firestore";
+import {
+  query,
+  collection,
+  getDocs,
+  where,
+  getCountFromServer,
+  limit,
+} from "firebase/firestore";
 import {
   ArrowDownCircleIcon,
   ArrowUpCircleIcon,
@@ -69,6 +76,9 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   const [showFullPost, setShowFullPost] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes);
   const [comments, setComments] = useState<IComment[]>([]);
+  const [totalNumOfComments, setTotalNumOfComments] = useState(0);
+  const [numOfComments, setNumOfComments] = useState(1);
+  const [displayShowMoreBtn, setDisplayShowMoreBtn] = useState(false);
 
   // Access contexts
   const { user } = useSession();
@@ -92,10 +102,26 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   const getComments = async () => {
     try {
       let arr: IComment[] = [];
+      let theQuery = query(
+        collection(db, "comments"),
+        where("post", "==", post.id)
+      );
+
+      // Get server count
+      const serverCount = await getCountFromServer(theQuery);
+
+      // Set total number of comments from server
+      setTotalNumOfComments(serverCount.data().count);
+
+      // Determine if to display show more btn
+      setDisplayShowMoreBtn(serverCount.data().count > numOfComments);
+
       // Get all post comments
       const querySnapshot = await getDocs(
-        query(collection(db, "comments"), where("post", "==", post.id))
+        query(theQuery, limit(numOfComments))
       );
+
+      // Get comment data
       querySnapshot.forEach((doc) => {
         const temp = { ...doc.data(), id: doc.id };
         arr.push(temp as IComment);
@@ -109,7 +135,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
 
   useEffect(() => {
     getComments();
-  }, []);
+  }, [numOfComments]);
 
   return (
     <div className="flex gap-6 p-4 border border-gray-800 hover:border-white">
@@ -185,7 +211,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
         <div className="pt-2 flex gap-2 items-center">
           <ChatBubbleLeftIcon className="h-4 w-4" />
           <p className="text-sm">
-            {comments.length} Comment{comments.length !== 1 && "s"}
+            {totalNumOfComments} Comment{comments.length !== 1 && "s"}
           </p>
         </div>
 
@@ -210,6 +236,13 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
               comments={comments}
               getComments={getComments}
             />
+            {displayShowMoreBtn && (
+              <Button
+                text="Show more posts"
+                size="sm"
+                onClick={() => setNumOfComments(numOfComments + 10)}
+              />
+            )}
           </Modal>
         )}
       </div>
