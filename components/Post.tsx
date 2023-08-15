@@ -77,7 +77,7 @@ export default function Post({ post, showGroupButton = true }: PostProp) {
   const [likeCount, setLikeCount] = useState(post.likes);
   const [comments, setComments] = useState<IComment[]>([]);
   const [totalNumOfComments, setTotalNumOfComments] = useState(0);
-  const [numOfComments, setNumOfComments] = useState(1);
+  const [numOfComments, setNumOfComments] = useState(10);
   const [displayShowMoreBtn, setDisplayShowMoreBtn] = useState(false);
 
   // Access contexts
