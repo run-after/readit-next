@@ -8,7 +8,7 @@ import {
   updateProfile,
   setPersistence,
 } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, getDocs, collection } from "firebase/firestore";
 
 import { useSession } from "@/contexts/session";
 import { useFirebase } from "@/contexts/firebase";
@@ -41,12 +41,20 @@ export default function Register() {
       return;
     }
 
-    // TODO: make sure display_name is unique
-
     // Access auth
     const auth = getAuth();
 
     try {
+      // Check if display_name is unique
+      const userSnapshot = await getDocs(collection(db, "users"));
+      userSnapshot.forEach((user) => {
+        if (
+          user.data().displayName.toLowerCase() ===
+          display_name.value.toLowerCase()
+        )
+          throw { code: "auth/username-taken" };
+      });
+
       // Set persistence
       await setPersistence(auth, browserSessionPersistence);
 
@@ -91,6 +99,9 @@ export default function Register() {
           break;
         case "auth/weak-password":
           setError("Weak password: must be at least 6 chars");
+          break;
+        case "auth/username-taken":
+          setError("Username already in use");
           break;
       }
     }
