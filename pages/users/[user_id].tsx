@@ -9,6 +9,7 @@ import {
   where,
   getCountFromServer,
   limit,
+  DocumentData,
 } from "firebase/firestore";
 import { useFirebase } from "@/contexts/firebase";
 
@@ -38,6 +39,7 @@ export default function User() {
   const [displayMorePostsBtn, setDisplayMorePostsBtn] = useState(false);
   const [numOfComments, setNumOfComments] = useState(10);
   const [displayMoreCommentsBtn, setDisplayMoreCommentsBtn] = useState(false);
+  const [displayedUser, setDisplayedUser] = useState<DocumentData | null>(null);
 
   const getPosts = async () => {
     let postArr: IPost[] = [];
@@ -139,6 +141,13 @@ export default function User() {
     }
   };
 
+  const getUserDetails = async (id: string) => {
+    const snapshot = await getDoc(doc(db, "users", id));
+    if (snapshot.exists()) {
+      setDisplayedUser(snapshot.data());
+    }
+  };
+
   useEffect(() => {
     if (selectedPost) getComments();
   }, [selectedPost]);
@@ -150,6 +159,10 @@ export default function User() {
   useEffect(() => {
     if (user_id) getUserComments();
   }, [user_id, numOfComments]);
+
+  useEffect(() => {
+    if (user_id) getUserDetails(`${user_id}`);
+  }, [user_id]);
 
   return (
     <Main>
@@ -203,7 +216,28 @@ export default function User() {
         {/* User card */}
         <div className="w-1/4 border border-gray-800 m-4 p-4 rounded space-y-4">
           <h6 className="text-gray-500 text-bold">About {user_id}</h6>
-          <p className="text-gray-300 text-sm">{user_id}</p>
+          <div>
+            <span className="text-gray-300 text-sm">Likes count: </span>
+            <span className="text-gray-300 text-sm font-bold">
+              {displayedUser?.likes.length}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-300 text-sm">Hates count: </span>
+            <span className="text-gray-300 text-sm font-bold">
+              {displayedUser?.hates.length}
+            </span>
+          </div>
+
+          {displayedUser?.createdAt && (
+            <div>
+              <span className="text-gray-300 text-sm">Created on: </span>
+              <span className="text-gray-300 text-sm font-bold">
+                {" "}
+                {new Date(displayedUser?.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+          )}
         </div>
       </div>
       {/* Modal */}
