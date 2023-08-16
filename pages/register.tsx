@@ -69,6 +69,7 @@ export default function Register() {
         groups: [],
         likes: [],
         hates: [],
+        createdAt: Date.now(),
       });
 
       // Get/set user info from firestore
